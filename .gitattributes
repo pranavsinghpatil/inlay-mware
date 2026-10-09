@@ -1,0 +1,7 @@
+# Frozen research-file hashes must be identical across Windows and CI.
+research/evidence-readiness/v1/*.md text eol=lf
+research/evidence-readiness/v1/*.json text eol=lf
+research/evidence-readiness/v1/*.ts text eol=lf
+# Preserve the intentional Markdown hard breaks in these frozen documents.
+research/evidence-readiness/v1/design-review.md whitespace=-blank-at-eol
+research/evidence-readiness/v1/protocol.md whitespace=-blank-at-eol

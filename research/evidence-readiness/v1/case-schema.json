@@ -1,0 +1,225 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "ERR-CAL-1 content-free case cards",
+  "type": "array",
+  "minItems": 24,
+  "maxItems": 24,
+  "items": {
+    "type": "object",
+    "additionalProperties": false,
+    "required": [
+      "id",
+      "title",
+      "comparison",
+      "measurementScope",
+      "measurements",
+      "evidence"
+    ],
+    "properties": {
+      "id": {
+        "type": "string",
+        "pattern": "^C(?:0[1-9]|1[0-9]|2[0-4])$"
+      },
+      "title": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 100
+      },
+      "comparison": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 300
+      },
+      "measurementScope": {
+        "enum": [
+          "captured_row",
+          "process_local",
+          "recorded_population",
+          "external_contract",
+          "whole_run"
+        ]
+      },
+      "measurements": {
+        "type": "object",
+        "additionalProperties": false,
+        "minProperties": 1,
+        "properties": {
+          "inputItems": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "minimum": 0
+          },
+          "inputTokens": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "minimum": 0
+          },
+          "outputTokens": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "minimum": 0
+          },
+          "totalTokens": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "minimum": 0
+          },
+          "cachedInputTokens": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "minimum": 0
+          },
+          "recurrenceCompared": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "minimum": 0
+          },
+          "recurrencePreviouslySeen": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "minimum": 0
+          },
+          "recordedCount": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "minimum": 0
+          },
+          "retainedCount": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "minimum": 0
+          },
+          "recurringGroups": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "minimum": 0
+          },
+          "exposedGroups": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "minimum": 0
+          },
+          "status": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "minimum": 0
+          },
+          "structureObserved": {
+            "type": "boolean"
+          },
+          "wirePreserved": {
+            "type": "boolean"
+          },
+          "headerTimingObserved": {
+            "type": "boolean"
+          },
+          "firstBodyTimingObserved": {
+            "type": "boolean"
+          },
+          "durationObserved": {
+            "type": "boolean"
+          },
+          "recurrenceIncomplete": {
+            "type": "boolean"
+          },
+          "pipelineCompleted": {
+            "type": "boolean"
+          },
+          "cancelled": {
+            "type": "boolean"
+          },
+          "cancelledAfterMarker": {
+            "type": "boolean"
+          },
+          "completionMarkerObserved": {
+            "type": "boolean"
+          },
+          "responseBytesObserved": {
+            "type": "boolean"
+          },
+          "knownParserIncomplete": {
+            "type": "boolean"
+          },
+          "recurringGroupsTruncated": {
+            "type": "boolean"
+          },
+          "snapshotsStable": {
+            "type": "boolean"
+          },
+          "retryFieldPresent": {
+            "type": "boolean"
+          },
+          "encoding": {
+            "enum": [
+              "identity",
+              "gzip",
+              "zstd"
+            ]
+          },
+          "structureUnavailableReason": {
+            "enum": [
+              "content_encoded",
+              "not_json",
+              "zstd_decode_failed",
+              "zstd_output_limit"
+            ]
+          },
+          "verifier": {
+            "enum": [
+              "PASS",
+              "FAIL",
+              "UNAVAILABLE"
+            ]
+          },
+          "scope": {
+            "enum": [
+              "PASS",
+              "FAIL",
+              "UNAVAILABLE"
+            ]
+          },
+          "harnessCompletion": {
+            "enum": [
+              "PASS",
+              "FAIL",
+              "UNAVAILABLE"
+            ]
+          }
+        }
+      },
+      "evidence": {
+        "type": "array",
+        "minItems": 1,
+        "items": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 150
+        }
+      }
+    }
+  }
+}

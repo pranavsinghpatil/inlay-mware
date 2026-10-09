@@ -1,0 +1,350 @@
+{
+  "protocolVersion": "ERR-CAL-1",
+  "baseline": "97a1047961cacdb6b44d2b13ee81ae5c97690b55",
+  "answers": [
+    {
+      "id": "C01",
+      "classification": "SUPPORTED",
+      "expectedMeasurements": {
+        "structureObserved": true,
+        "inputItems": 1,
+        "encoding": "identity"
+      },
+      "reason": "Approved structure is observed for the captured row; no task or full-run claim.",
+      "evidence": [
+        "proxy.test.ts:54,66,76",
+        "calibration C01"
+      ]
+    },
+    {
+      "id": "C02",
+      "classification": "SUPPORTED",
+      "expectedMeasurements": {
+        "structureObserved": true,
+        "inputItems": 1,
+        "encoding": "zstd",
+        "wirePreserved": true
+      },
+      "reason": "Bounded decoding succeeds and original compressed forwarding is preserved.",
+      "evidence": [
+        "proxy.test.ts:481",
+        "calibration C02"
+      ]
+    },
+    {
+      "id": "C03",
+      "classification": "SUPPORTED",
+      "expectedMeasurements": {
+        "inputTokens": 12,
+        "outputTokens": 8,
+        "totalTokens": 20,
+        "cachedInputTokens": 0
+      },
+      "reason": "Zero is an observed numeric field; no final-usage or billing inference.",
+      "evidence": [
+        "proxy.test.ts:241",
+        "calibration C03"
+      ]
+    },
+    {
+      "id": "C04",
+      "classification": "SUPPORTED",
+      "expectedMeasurements": {
+        "headerTimingObserved": true,
+        "firstBodyTimingObserved": true,
+        "durationObserved": true
+      },
+      "reason": "Presence of the three local timing fields is observable; backend-only duration is outside scope.",
+      "evidence": [
+        "proxy.test.ts:241",
+        "calibration C04"
+      ]
+    },
+    {
+      "id": "C05",
+      "classification": "SUPPORTED",
+      "expectedMeasurements": {
+        "recurrenceCompared": 1,
+        "recurrencePreviouslySeen": 1,
+        "recurrenceIncomplete": false
+      },
+      "reason": "An exact canonical match is observable in this bounded serial fixture; semantic equivalence is not.",
+      "evidence": [
+        "proxy.test.ts:86,146",
+        "calibration C05"
+      ]
+    },
+    {
+      "id": "C06",
+      "classification": "SUPPORTED",
+      "expectedMeasurements": {
+        "pipelineCompleted": false,
+        "cancelled": true,
+        "cancelledAfterMarker": true,
+        "completionMarkerObserved": true
+      },
+      "reason": "The emitted lifecycle flags distinguish these selected cases; they do not establish task success.",
+      "evidence": [
+        "proxy.test.ts:376",
+        "calibration C06"
+      ]
+    },
+    {
+      "id": "C07",
+      "classification": "PARTIAL",
+      "expectedMeasurements": {
+        "inputTokens": 12,
+        "outputTokens": null,
+        "totalTokens": null,
+        "cachedInputTokens": null
+      },
+      "reason": "Only input is observed; abstain from the full input/output comparison.",
+      "evidence": [
+        "calibration C07"
+      ]
+    },
+    {
+      "id": "C08",
+      "classification": "PARTIAL",
+      "expectedMeasurements": {
+        "inputTokens": 12,
+        "outputTokens": null,
+        "totalTokens": null,
+        "cachedInputTokens": 0
+      },
+      "reason": "Invalid numeric representations are ignored; retained values do not complete the tuple.",
+      "evidence": [
+        "calibration C08"
+      ]
+    },
+    {
+      "id": "C09",
+      "classification": "PARTIAL",
+      "expectedMeasurements": {
+        "responseBytesObserved": true,
+        "firstBodyTimingObserved": true,
+        "knownParserIncomplete": true,
+        "completionMarkerObserved": false
+      },
+      "reason": "Byte arrival is observed; marker parsing coverage is not valid for the full bundle.",
+      "evidence": [
+        "proxy.test.ts:422",
+        "calibration C09"
+      ]
+    },
+    {
+      "id": "C10",
+      "classification": "PARTIAL",
+      "expectedMeasurements": {
+        "responseBytesObserved": true,
+        "knownParserIncomplete": true,
+        "completionMarkerObserved": false
+      },
+      "reason": "Bytes arrived but the final frame was not completely observed; abstain from full-frame claims.",
+      "evidence": [
+        "proxy.test.ts:451",
+        "calibration C10"
+      ]
+    },
+    {
+      "id": "C11",
+      "classification": "PARTIAL",
+      "expectedMeasurements": {
+        "recordedCount": 101,
+        "retainedCount": 100
+      },
+      "reason": "Count is retained but the complete per-row status population is not; current-window status cannot stand for the full population.",
+      "evidence": [
+        "proxy.test.ts:31",
+        "calibration C11"
+      ]
+    },
+    {
+      "id": "C12",
+      "classification": "PARTIAL",
+      "expectedMeasurements": {
+        "recurrencePreviouslySeen": 65,
+        "recurrenceIncomplete": true,
+        "recurringGroups": 65,
+        "exposedGroups": 64,
+        "recurringGroupsTruncated": true
+      },
+      "reason": "The group cap and exposed-list cap prohibit exhaustive recurrence claims despite some observed matches.",
+      "evidence": [
+        "calibration C12"
+      ]
+    },
+    {
+      "id": "C13",
+      "classification": "UNAVAILABLE",
+      "expectedMeasurements": {
+        "inputTokens": null,
+        "outputTokens": null,
+        "totalTokens": null,
+        "cachedInputTokens": null
+      },
+      "reason": "The required numeric fields are unavailable; this does not establish zero consumption or its cause.",
+      "evidence": [
+        "calibration C13"
+      ]
+    },
+    {
+      "id": "C14",
+      "classification": "UNAVAILABLE",
+      "expectedMeasurements": {
+        "structureObserved": false,
+        "structureUnavailableReason": "content_encoded",
+        "encoding": "gzip",
+        "wirePreserved": true
+      },
+      "reason": "The existing observer does not decode gzip structure; unchanged forwarding does not make structure available.",
+      "evidence": [
+        "calibration C14"
+      ]
+    },
+    {
+      "id": "C15",
+      "classification": "UNAVAILABLE",
+      "expectedMeasurements": {
+        "structureObserved": false,
+        "structureUnavailableReason": "zstd_decode_failed",
+        "encoding": "zstd",
+        "wirePreserved": true
+      },
+      "reason": "The observer records decode unavailability and preserves compressed forwarding.",
+      "evidence": [
+        "proxy.test.ts:535",
+        "calibration C15"
+      ]
+    },
+    {
+      "id": "C16",
+      "classification": "UNAVAILABLE",
+      "expectedMeasurements": {
+        "structureObserved": false,
+        "structureUnavailableReason": "zstd_output_limit",
+        "encoding": "zstd",
+        "wirePreserved": true
+      },
+      "reason": "The required decoded structure is unavailable at the output cap.",
+      "evidence": [
+        "proxy.test.ts:612",
+        "calibration C16"
+      ]
+    },
+    {
+      "id": "C17",
+      "classification": "UNAVAILABLE",
+      "expectedMeasurements": {
+        "status": 204,
+        "pipelineCompleted": true,
+        "headerTimingObserved": true,
+        "firstBodyTimingObserved": false
+      },
+      "reason": "Header/pipeline facts do not supply the missing first-body-byte time.",
+      "evidence": [
+        "calibration C17"
+      ]
+    },
+    {
+      "id": "C18",
+      "classification": "UNAVAILABLE",
+      "expectedMeasurements": {
+        "status": 200,
+        "completionMarkerObserved": true,
+        "verifier": "FAIL",
+        "scope": "PASS",
+        "harnessCompletion": "PASS"
+      },
+      "reason": "A known failing external contract prevents this comparison; HTTP success cannot substitute. Sidecar flags are supplied research facts, not proxy measurements.",
+      "evidence": [
+        "calibration C18",
+        "historical independent verifier contract"
+      ]
+    },
+    {
+      "id": "C19",
+      "classification": "UNKNOWN_MUST_ABSTAIN",
+      "expectedMeasurements": {
+        "inputTokens": null,
+        "outputTokens": null,
+        "totalTokens": null,
+        "cachedInputTokens": null,
+        "knownParserIncomplete": false,
+        "completionMarkerObserved": false
+      },
+      "reason": "Malformed and parseable no-usage SSE can have identical approved projections; cause must remain unknown.",
+      "evidence": [
+        "calibration C19 paired-world equality"
+      ]
+    },
+    {
+      "id": "C20",
+      "classification": "UNKNOWN_MUST_ABSTAIN",
+      "expectedMeasurements": {
+        "status": 200,
+        "pipelineCompleted": true,
+        "completionMarkerObserved": false,
+        "knownParserIncomplete": false
+      },
+      "reason": "Both event families can collapse to the same approved facts; missing recognized completion is not a terminal-state taxonomy.",
+      "evidence": [
+        "calibration C20 paired-world equality"
+      ]
+    },
+    {
+      "id": "C21",
+      "classification": "UNKNOWN_MUST_ABSTAIN",
+      "expectedMeasurements": {
+        "recordedCount": 0,
+        "retainedCount": 0
+      },
+      "reason": "An unconfigured supported-route attempt and an unsupported-route attempt both leave zero recorded outcomes; zero recorded is not zero attempted.",
+      "evidence": [
+        "calibration C21 paired-world equality"
+      ]
+    },
+    {
+      "id": "C22",
+      "classification": "UNKNOWN_MUST_ABSTAIN",
+      "expectedMeasurements": {
+        "recordedCount": 1,
+        "retainedCount": 1,
+        "snapshotsStable": true
+      },
+      "reason": "An in-flight supported exchange can coexist with unchanged stable snapshots; no arrival/in-flight denominator exists.",
+      "evidence": [
+        "calibration C22 in-flight paired-world equality"
+      ]
+    },
+    {
+      "id": "C23",
+      "classification": "UNKNOWN_MUST_ABSTAIN",
+      "expectedMeasurements": {
+        "recordedCount": 2,
+        "retainedCount": 2,
+        "retryFieldPresent": false
+      },
+      "reason": "Matching transport sequences can represent independent or retry scheduling. No retry/cause field distinguishes them.",
+      "evidence": [
+        "calibration C23 observational equivalence"
+      ]
+    },
+    {
+      "id": "C24",
+      "classification": "UNKNOWN_MUST_ABSTAIN",
+      "expectedMeasurements": {
+        "status": 200,
+        "pipelineCompleted": true,
+        "completionMarkerObserved": true,
+        "verifier": "UNAVAILABLE",
+        "scope": "UNAVAILABLE",
+        "harnessCompletion": "UNAVAILABLE"
+      },
+      "reason": "Transport facts are compatible with passing or failing external task outcomes; all task outcomes must remain unknown without independent evidence.",
+      "evidence": [
+        "calibration C24 omitted-sidecar equivalence"
+      ]
+    }
+  ]
+}

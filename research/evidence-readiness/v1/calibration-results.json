@@ -1,0 +1,689 @@
+{
+  "protocolVersion": "ERR-CAL-1",
+  "substrate": "97a1047961cacdb6b44d2b13ee81ae5c97690b55",
+  "status": "PASS",
+  "caseCount": 24,
+  "classificationCounts": {
+    "SUPPORTED": 6,
+    "PARTIAL": 6,
+    "UNAVAILABLE": 6,
+    "UNKNOWN_MUST_ABSTAIN": 6
+  },
+  "liveRuns": 0,
+  "participantRuns": 0,
+  "productionReportImplemented": false,
+  "cases": [
+    {
+      "id": "C01",
+      "expectedClassification": "SUPPORTED",
+      "classification": "SUPPORTED",
+      "status": "PASS",
+      "measurementMatch": true,
+      "measurements": {
+        "structureObserved": true,
+        "inputItems": 1,
+        "encoding": "identity"
+      },
+      "checks": [
+        {
+          "id": "request_preserved",
+          "passed": true
+        },
+        {
+          "id": "response_preserved",
+          "passed": true
+        },
+        {
+          "id": "status_preserved",
+          "passed": true
+        }
+      ]
+    },
+    {
+      "id": "C02",
+      "expectedClassification": "SUPPORTED",
+      "classification": "SUPPORTED",
+      "status": "PASS",
+      "measurementMatch": true,
+      "measurements": {
+        "structureObserved": true,
+        "inputItems": 1,
+        "encoding": "zstd",
+        "wirePreserved": true
+      },
+      "checks": [
+        {
+          "id": "request_preserved",
+          "passed": true
+        },
+        {
+          "id": "response_preserved",
+          "passed": true
+        },
+        {
+          "id": "status_preserved",
+          "passed": true
+        }
+      ]
+    },
+    {
+      "id": "C03",
+      "expectedClassification": "SUPPORTED",
+      "classification": "SUPPORTED",
+      "status": "PASS",
+      "measurementMatch": true,
+      "measurements": {
+        "inputTokens": 12,
+        "outputTokens": 8,
+        "totalTokens": 20,
+        "cachedInputTokens": 0
+      },
+      "checks": [
+        {
+          "id": "numeric_zero_retained",
+          "passed": true
+        },
+        {
+          "id": "complete_encountered_tuple",
+          "passed": true
+        }
+      ]
+    },
+    {
+      "id": "C04",
+      "expectedClassification": "SUPPORTED",
+      "classification": "SUPPORTED",
+      "status": "PASS",
+      "measurementMatch": true,
+      "measurements": {
+        "headerTimingObserved": true,
+        "firstBodyTimingObserved": true,
+        "durationObserved": true
+      },
+      "checks": [
+        {
+          "id": "request_preserved",
+          "passed": true
+        },
+        {
+          "id": "response_preserved",
+          "passed": true
+        },
+        {
+          "id": "status_preserved",
+          "passed": true
+        },
+        {
+          "id": "local_timing_order",
+          "passed": true
+        }
+      ]
+    },
+    {
+      "id": "C05",
+      "expectedClassification": "SUPPORTED",
+      "classification": "SUPPORTED",
+      "status": "PASS",
+      "measurementMatch": true,
+      "measurements": {
+        "recurrenceCompared": 1,
+        "recurrencePreviouslySeen": 1,
+        "recurrenceIncomplete": false
+      },
+      "checks": [
+        {
+          "id": "initial_has_no_previous_match",
+          "passed": true
+        },
+        {
+          "id": "key_reordering_matches",
+          "passed": true
+        }
+      ]
+    },
+    {
+      "id": "C06",
+      "expectedClassification": "SUPPORTED",
+      "classification": "SUPPORTED",
+      "status": "PASS",
+      "measurementMatch": true,
+      "measurements": {
+        "pipelineCompleted": false,
+        "cancelled": true,
+        "cancelledAfterMarker": true,
+        "completionMarkerObserved": true
+      },
+      "checks": [
+        {
+          "id": "request_preserved",
+          "passed": true
+        },
+        {
+          "id": "response_preserved",
+          "passed": true
+        },
+        {
+          "id": "status_preserved",
+          "passed": true
+        },
+        {
+          "id": "before_response_preserved",
+          "passed": true
+        },
+        {
+          "id": "both_are_client_disconnects",
+          "passed": true
+        },
+        {
+          "id": "before_marker_distinguished",
+          "passed": true
+        }
+      ]
+    },
+    {
+      "id": "C07",
+      "expectedClassification": "PARTIAL",
+      "classification": "PARTIAL",
+      "status": "PASS",
+      "measurementMatch": true,
+      "measurements": {
+        "inputTokens": 12,
+        "outputTokens": null,
+        "totalTokens": null,
+        "cachedInputTokens": null
+      },
+      "checks": [
+        {
+          "id": "output_is_absent",
+          "passed": true
+        },
+        {
+          "id": "input_is_present",
+          "passed": true
+        }
+      ]
+    },
+    {
+      "id": "C08",
+      "expectedClassification": "PARTIAL",
+      "classification": "PARTIAL",
+      "status": "PASS",
+      "measurementMatch": true,
+      "measurements": {
+        "inputTokens": 12,
+        "outputTokens": null,
+        "totalTokens": null,
+        "cachedInputTokens": 0
+      },
+      "checks": [
+        {
+          "id": "invalid_numeric_fields_ignored",
+          "passed": true
+        },
+        {
+          "id": "zero_still_retained",
+          "passed": true
+        }
+      ]
+    },
+    {
+      "id": "C09",
+      "expectedClassification": "PARTIAL",
+      "classification": "PARTIAL",
+      "status": "PASS",
+      "measurementMatch": true,
+      "measurements": {
+        "responseBytesObserved": true,
+        "firstBodyTimingObserved": true,
+        "knownParserIncomplete": true,
+        "completionMarkerObserved": false
+      },
+      "checks": [
+        {
+          "id": "byte_count_survives_limit",
+          "passed": true
+        },
+        {
+          "id": "pending_cap_detected",
+          "passed": true
+        }
+      ]
+    },
+    {
+      "id": "C10",
+      "expectedClassification": "PARTIAL",
+      "classification": "PARTIAL",
+      "status": "PASS",
+      "measurementMatch": true,
+      "measurements": {
+        "responseBytesObserved": true,
+        "knownParserIncomplete": true,
+        "completionMarkerObserved": false
+      },
+      "checks": [
+        {
+          "id": "final_pending_frame_detected",
+          "passed": true
+        },
+        {
+          "id": "byte_count_retained",
+          "passed": true
+        }
+      ]
+    },
+    {
+      "id": "C11",
+      "expectedClassification": "PARTIAL",
+      "classification": "PARTIAL",
+      "status": "PASS",
+      "measurementMatch": true,
+      "measurements": {
+        "recordedCount": 101,
+        "retainedCount": 100
+      },
+      "checks": [
+        {
+          "id": "evicted_status_difference_hidden",
+          "passed": true
+        },
+        {
+          "id": "independent_count_is_101",
+          "passed": true
+        },
+        {
+          "id": "window_is_100",
+          "passed": true
+        }
+      ]
+    },
+    {
+      "id": "C12",
+      "expectedClassification": "PARTIAL",
+      "classification": "PARTIAL",
+      "status": "PASS",
+      "measurementMatch": true,
+      "measurements": {
+        "recurrencePreviouslySeen": 65,
+        "recurrenceIncomplete": true,
+        "recurringGroups": 65,
+        "exposedGroups": 64,
+        "recurringGroupsTruncated": true
+      },
+      "checks": [
+        {
+          "id": "group_capacity_detected",
+          "passed": true
+        },
+        {
+          "id": "exposed_group_cap_detected",
+          "passed": true
+        },
+        {
+          "id": "separate_input_limit_unavailable",
+          "passed": true
+        }
+      ]
+    },
+    {
+      "id": "C13",
+      "expectedClassification": "UNAVAILABLE",
+      "classification": "UNAVAILABLE",
+      "status": "PASS",
+      "measurementMatch": true,
+      "measurements": {
+        "inputTokens": null,
+        "outputTokens": null,
+        "totalTokens": null,
+        "cachedInputTokens": null
+      },
+      "checks": [
+        {
+          "id": "no_usage_is_not_zero",
+          "passed": true
+        },
+        {
+          "id": "recognized_completion_without_usage",
+          "passed": true
+        }
+      ]
+    },
+    {
+      "id": "C14",
+      "expectedClassification": "UNAVAILABLE",
+      "classification": "UNAVAILABLE",
+      "status": "PASS",
+      "measurementMatch": true,
+      "measurements": {
+        "structureObserved": false,
+        "structureUnavailableReason": "content_encoded",
+        "encoding": "gzip",
+        "wirePreserved": true
+      },
+      "checks": [
+        {
+          "id": "request_preserved",
+          "passed": true
+        },
+        {
+          "id": "response_preserved",
+          "passed": true
+        },
+        {
+          "id": "status_preserved",
+          "passed": true
+        }
+      ]
+    },
+    {
+      "id": "C15",
+      "expectedClassification": "UNAVAILABLE",
+      "classification": "UNAVAILABLE",
+      "status": "PASS",
+      "measurementMatch": true,
+      "measurements": {
+        "structureObserved": false,
+        "structureUnavailableReason": "zstd_decode_failed",
+        "encoding": "zstd",
+        "wirePreserved": true
+      },
+      "checks": [
+        {
+          "id": "request_preserved",
+          "passed": true
+        },
+        {
+          "id": "response_preserved",
+          "passed": true
+        },
+        {
+          "id": "status_preserved",
+          "passed": true
+        }
+      ]
+    },
+    {
+      "id": "C16",
+      "expectedClassification": "UNAVAILABLE",
+      "classification": "UNAVAILABLE",
+      "status": "PASS",
+      "measurementMatch": true,
+      "measurements": {
+        "structureObserved": false,
+        "structureUnavailableReason": "zstd_output_limit",
+        "encoding": "zstd",
+        "wirePreserved": true
+      },
+      "checks": [
+        {
+          "id": "request_preserved",
+          "passed": true
+        },
+        {
+          "id": "response_preserved",
+          "passed": true
+        },
+        {
+          "id": "status_preserved",
+          "passed": true
+        }
+      ]
+    },
+    {
+      "id": "C17",
+      "expectedClassification": "UNAVAILABLE",
+      "classification": "UNAVAILABLE",
+      "status": "PASS",
+      "measurementMatch": true,
+      "measurements": {
+        "status": 204,
+        "pipelineCompleted": true,
+        "headerTimingObserved": true,
+        "firstBodyTimingObserved": false
+      },
+      "checks": [
+        {
+          "id": "request_preserved",
+          "passed": true
+        },
+        {
+          "id": "response_preserved",
+          "passed": true
+        },
+        {
+          "id": "status_preserved",
+          "passed": true
+        }
+      ]
+    },
+    {
+      "id": "C18",
+      "expectedClassification": "UNAVAILABLE",
+      "classification": "UNAVAILABLE",
+      "status": "PASS",
+      "measurementMatch": true,
+      "measurements": {
+        "status": 200,
+        "completionMarkerObserved": true,
+        "verifier": "FAIL",
+        "scope": "PASS",
+        "harnessCompletion": "PASS"
+      },
+      "checks": [
+        {
+          "id": "request_preserved",
+          "passed": true
+        },
+        {
+          "id": "response_preserved",
+          "passed": true
+        },
+        {
+          "id": "status_preserved",
+          "passed": true
+        },
+        {
+          "id": "sidecar_is_explicitly_external",
+          "passed": true
+        },
+        {
+          "id": "failure_is_not_overridden_by_http",
+          "passed": true
+        }
+      ]
+    },
+    {
+      "id": "C19",
+      "expectedClassification": "UNKNOWN_MUST_ABSTAIN",
+      "classification": "UNKNOWN_MUST_ABSTAIN",
+      "status": "PASS",
+      "measurementMatch": true,
+      "measurements": {
+        "inputTokens": null,
+        "outputTokens": null,
+        "totalTokens": null,
+        "cachedInputTokens": null,
+        "knownParserIncomplete": false,
+        "completionMarkerObserved": false
+      },
+      "checks": [
+        {
+          "id": "different_wire_inputs",
+          "passed": true
+        },
+        {
+          "id": "all_approved_observer_facts_equal",
+          "passed": true
+        },
+        {
+          "id": "malformed_input_not_flagged",
+          "passed": true
+        }
+      ]
+    },
+    {
+      "id": "C20",
+      "expectedClassification": "UNKNOWN_MUST_ABSTAIN",
+      "classification": "UNKNOWN_MUST_ABSTAIN",
+      "status": "PASS",
+      "measurementMatch": true,
+      "measurements": {
+        "status": 200,
+        "pipelineCompleted": true,
+        "completionMarkerObserved": false,
+        "knownParserIncomplete": false
+      },
+      "checks": [
+        {
+          "id": "request_preserved",
+          "passed": true
+        },
+        {
+          "id": "response_preserved",
+          "passed": true
+        },
+        {
+          "id": "status_preserved",
+          "passed": true
+        },
+        {
+          "id": "alternative_response_preserved",
+          "passed": true
+        },
+        {
+          "id": "distinct_event_families",
+          "passed": true
+        },
+        {
+          "id": "approved_semantic_projections_equal",
+          "passed": true
+        }
+      ]
+    },
+    {
+      "id": "C21",
+      "expectedClassification": "UNKNOWN_MUST_ABSTAIN",
+      "classification": "UNKNOWN_MUST_ABSTAIN",
+      "status": "PASS",
+      "measurementMatch": true,
+      "measurements": {
+        "recordedCount": 0,
+        "retainedCount": 0
+      },
+      "checks": [
+        {
+          "id": "attempted_routes_return_expected_status",
+          "passed": true
+        },
+        {
+          "id": "approved_count_projections_equal",
+          "passed": true
+        }
+      ]
+    },
+    {
+      "id": "C22",
+      "expectedClassification": "UNKNOWN_MUST_ABSTAIN",
+      "classification": "UNKNOWN_MUST_ABSTAIN",
+      "status": "PASS",
+      "measurementMatch": true,
+      "measurements": {
+        "recordedCount": 1,
+        "retainedCount": 1,
+        "snapshotsStable": true
+      },
+      "checks": [
+        {
+          "id": "in_flight_and_idle_projections_equal",
+          "passed": true
+        },
+        {
+          "id": "supported_second_request_reached_upstream",
+          "passed": true
+        },
+        {
+          "id": "late_outcome_eventually_recorded",
+          "passed": true
+        },
+        {
+          "id": "response_preserved",
+          "passed": true
+        }
+      ]
+    },
+    {
+      "id": "C23",
+      "expectedClassification": "UNKNOWN_MUST_ABSTAIN",
+      "classification": "UNKNOWN_MUST_ABSTAIN",
+      "status": "PASS",
+      "measurementMatch": true,
+      "measurements": {
+        "recordedCount": 2,
+        "retainedCount": 2,
+        "retryFieldPresent": false
+      },
+      "checks": [
+        {
+          "id": "request_preserved",
+          "passed": true
+        },
+        {
+          "id": "response_preserved",
+          "passed": true
+        },
+        {
+          "id": "status_preserved",
+          "passed": true
+        },
+        {
+          "id": "alternative_response_preserved",
+          "passed": true
+        },
+        {
+          "id": "transport_count_projections_equal",
+          "passed": true
+        },
+        {
+          "id": "schema_has_no_retry_cause",
+          "passed": true
+        }
+      ]
+    },
+    {
+      "id": "C24",
+      "expectedClassification": "UNKNOWN_MUST_ABSTAIN",
+      "classification": "UNKNOWN_MUST_ABSTAIN",
+      "status": "PASS",
+      "measurementMatch": true,
+      "measurements": {
+        "status": 200,
+        "pipelineCompleted": true,
+        "completionMarkerObserved": true,
+        "verifier": "UNAVAILABLE",
+        "scope": "UNAVAILABLE",
+        "harnessCompletion": "UNAVAILABLE"
+      },
+      "checks": [
+        {
+          "id": "request_preserved",
+          "passed": true
+        },
+        {
+          "id": "response_preserved",
+          "passed": true
+        },
+        {
+          "id": "status_preserved",
+          "passed": true
+        },
+        {
+          "id": "task_outcomes_not_in_metric",
+          "passed": true
+        },
+        {
+          "id": "distinct_external_outcomes_same_transport",
+          "passed": true
+        }
+      ]
+    }
+  ]
+}

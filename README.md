@@ -7,77 +7,34 @@
   <a href="https://github.com/pranavsinghpatil/inlay-mware/actions/workflows/ci.yml"><img src="https://github.com/pranavsinghpatil/inlay-mware/actions/workflows/ci.yml/badge.svg" alt="CI" /></a>
   <a href="https://github.com/pranavsinghpatil/inlay-mware/releases/tag/v0.1.0"><img src="https://img.shields.io/github/v/release/pranavsinghpatil/inlay-mware?display_name=tag&sort=semver" alt="Release" /></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-Apache--2.0-blue.svg" alt="License" /></a>
-</p> 
+</p>
 
-
-
-
-
-**A local-first research middleware for making coding-agent workflows
-observable—without replacing the agent, changing its backend, or pretending
-unproven optimizations work.**
+Inlay is local middleware for observing selected coding-agent provider traffic
+and measuring bounded, content-free transport and request structure. It
+forwards requests to the configured provider while the existing harness
+continues to run the agent and own its authentication.
 
 ```text
-coding harness → Inlay → existing provider/backend
+coding harness → Inlay → configured provider
 ```
 
-It is not a coding agent, agent runner, generic wrapper, universal harness
-router, credential manager, or established optimizer. Efficiency mechanisms
-remain research hypotheses; none is a released capability.
+Inlay is not an agent runner or a request-transformation system. Its current
+release provides transport observation; optimization mechanisms remain
+research questions.
 
-> **The question Inlay is built for:** What is an agent actually sending,
-> waiting on, and repeating—and can a proposed improvement preserve task
-> success before anyone calls it an optimization?
+## Validated profiles
 
-## Why it exists
-
-Coding agents can accumulate provider context, tool history, requests, and
-latency that are difficult to measure without replacing the agent. Inlay's
-current purpose is narrower: transparently forward one validated profile and
-derive bounded, content-free measurements while independently checking task
-completion. Observed structural growth or recurrence is not semantic
-redundancy, removability, token savings, cost savings, or latency improvement.
-
-## The evidence-first loop
-
-```text
-transparent placement
-        ↓
-privacy-bounded measurement
-        ↓
-deterministic task verification
-        ↓
-research decision: test, reject, or stop
-```
-
-This is the difference between an “agent optimization” demo and an engineering
-claim you can defend in a design review or technical interview.
-
-## Current validated profiles
-
-| Profile | Evidence | Boundary |
+| Profile | Observed result | Scope |
 | --- | --- | --- |
-| Codex HTTP Responses | Live C2 coding tasks completed through `POST /v1/responses` with SSE pass-through and no payload change. | One Codex CLI/provider/task profile; not general Codex support. |
-| Pi experimental adapter | One Pi 0.86.0 C2 task completed through existing `openai-codex` OAuth using `POST /v1/codex/responses`. | An explicitly loaded, Pi-only adapter/profile; not general Pi or multi-harness support. |
-| Pi Codex Responses alias | The narrow `POST /v1/codex/responses` compatibility alias was live-validated. | It forwards to the configured Responses upstream; it is not a general protocol layer. |
+| Codex HTTP Responses | C2 tasks completed through `POST /v1/responses` with SSE pass-through and unchanged request payloads. | Evidence covers the observed Codex CLI, provider, and task profile. |
+| Pi Responses alias | The `POST /v1/codex/responses` compatibility alias passed transport validation for Pi 0.86.0 using its existing `openai-codex` OAuth flow. | A narrow route and profile; this does not establish general Pi or multi-harness support. |
+| Pi action adapter | One Pi 0.86.0 C2 task completed with the explicitly loaded research adapter. | Adapter-specific evidence; it does not establish general action lifecycle support. |
 
-The Pi content-free cross-boundary timeline does **not** have a completed
-trajectory: its latest launch exited before a supported provider request or
-harness action. Its cause is intentionally unknown because the probe retains
-no raw diagnostic content.
+The latest content-free cross-boundary timeline attempt ended before a supported
+provider request or harness action. The cause was not recorded because the
+probe does not retain raw diagnostic content.
 
-## v0.1.0 at a glance
-
-| Ships | Does not ship |
-| --- | --- |
-| Transparent loopback middleware | Context pruning or request rewriting |
-| Codex Responses + narrow Pi alias evidence | An agent runner or universal harness router |
-| Bounded structural/zstd observation | Token, cost, latency, or tool-call reduction claims |
-| Sanitized measurement infrastructure and CI | A hidden raw-payload archive |
-
-**The result:** a small, runnable evidence baseline—not a hype-driven wrapper.
-
-## Run the validated transport locally
+## Run locally
 
 Requirements: Node `>=22.15.0`, pnpm, and an already authenticated supported
 harness/provider profile. Inlay does not obtain, store, or configure provider
@@ -97,103 +54,70 @@ Check the loopback server with:
 Invoke-RestMethod http://127.0.0.1:8787/health
 ```
 
-For the validated Codex CLI experiment, configure Codex's existing
-process-level `openai_base_url` setting to `http://127.0.0.1:8787/v1`; its
-existing ChatGPT authentication continues to be owned by Codex.
+For the validated Codex CLI profile, configure its existing process-level
+`openai_base_url` setting to `http://127.0.0.1:8787/v1`. Codex continues to
+manage its existing ChatGPT authentication.
 
-The public runtime surface is loopback-only:
+The loopback runtime exposes:
 
 - `GET /health`
 - `GET /metrics`
-- `POST /v1/responses` — validated Codex HTTP Responses route
-- `POST /v1/codex/responses` — narrow Pi compatibility alias
-- `POST /v1/chat/completions` — synthetic-test-only compatibility route
+- `POST /v1/responses` for the validated Codex HTTP Responses route
+- `POST /v1/codex/responses` for the narrow Pi compatibility alias
+- `POST /v1/chat/completions` for synthetic tests only
 
-`GET /v1/models` and WebSocket transport are unsupported. A harness may probe
-them; that is not an Inlay fallback or a claim of compatibility. Requests are
-buffered before transparent forwarding; upstream SSE bytes stream without
-semantic rewriting.
+`GET /v1/models` and WebSocket transport are unsupported. Requests are buffered
+before forwarding; upstream SSE bytes pass through without semantic rewriting.
 
-## What Inlay currently measures
+## Measurements and limits
 
-Structural observation is off by default. Set `INLAY_OBSERVATION=structural`
-only for a named experiment. It can measure, when the supported provider emits
-them:
+Structural observation is disabled by default. Set
+`INLAY_OBSERVATION=structural` for a named experiment. When available, Inlay can
+record bounded transport fields, HTTP status, lifecycle state, numeric provider
+usage, approved request structure, and timing to upstream headers or the first
+response byte. Explicit Pi research adapters can record fixed action categories,
+outcomes, durations, and verifier classes.
 
-- bounded request/response transport fields, HTTP status, lifecycle state, and
-  numeric provider usage;
-- approved request structure: whitelisted top-level fields, fixed item
-  categories/counts, and canonical structural-byte totals;
-- first upstream-header/response-byte timing and terminal-event observation;
-- in explicitly loaded Pi research adapters, fixed action categories, outcomes,
-  durations, and verifier class.
-
-These are three distinct quantities:
-
-| Measure | Definition | Interpretation |
-| --- | --- | --- |
-| Wire request bytes | Exact buffered request-body length received by Inlay | Transport size only |
-| Compressed request bytes | Wire bytes when `Content-Encoding: zstd` | Neither decoded size nor tokens |
-| Canonical structural bytes | UTF-8 bytes after recursively sorting object keys, preserving array order, then `JSON.stringify` on a transient whitelisted value | Stable local structural-size proxy; not wire bytes, provider tokens, or billing |
-
-In plain English: Inlay can expose *structure and transport behavior*; it
-cannot see whether an item is semantically redundant, whether model reasoning
-is wasted, or whether a rewrite would preserve provider cache behavior.
+Wire request bytes, compressed request bytes, and canonical structural bytes
+are separate measurements. They describe transport size or a local structural
+size proxy; they do not establish token counts, billing, or savings.
 
 ## Privacy boundary
 
 Inlay does not persist raw request or response bodies. Structural decoding is
-transient and bounded; upstream bytes and headers are forwarded without
-rewriting. The process-local `/metrics` window retains up to 100 request
-records containing a generated request identifier, timestamps, approved
-aggregate structure, lifecycle fields, and numeric usage when emitted. It is
-not zero retention and must remain loopback-only.
+transient and bounded, and forwarded bytes are not rewritten. The process-local
+`/metrics` window retains up to 100 request records with generated request IDs,
+timestamps, approved aggregate structure, lifecycle fields, and numeric usage
+when emitted. This is limited retention, not zero retention, and the endpoint
+is loopback-only.
 
-Explicit Pi research adapters can write a Git-ignored, bounded local spool of
-fixed categories, counts, outcomes, and durations. Research records retain
-only sanitized aggregates. Neither path is designed to observe model reasoning,
-semantic redundancy, tool meaning, causal dependencies, provider-internal
-economics, provider-only backend latency, or model decision boundaries.
+Explicit Pi research adapters can write a bounded, Git-ignored local spool of
+fixed categories, counts, outcomes, and durations. Sanitized research records
+omit raw content. These measurements do not expose semantic redundancy,
+causality, provider-internal economics, backend-only latency, or model decision
+boundaries.
 
-## Evidence and research status
+## Evidence status
 
-- Context growth and exact canonical recurrence were observed in a narrow Codex
-  C2 trajectory; semantic identity, necessity, redundancy, and removability
-  were not established.
-- ObservationPack, Evidence-Preserving Reducer, and Online Context Compaction
-  are not evidence-eligible for the observed Codex trajectory.
-- Action Fusion v1's experimental compound interface failed its capability
-  gate and is retired as a release capability.
-- The content-free cross-boundary timeline measurement gate did not pass.
+The available evidence is limited to the named profiles and study tasks.
+Context growth and exact canonical recurrence were observed in a Codex C2
+trajectory; semantic identity, necessity, redundancy, and removability were
+not established. ObservationPack, Evidence-Preserving Reducer, and Online
+Context Compaction are not evidence-eligible for that observed trajectory.
+The Action Fusion v1 treatment failed its capability gate for the frozen pilot
+configuration. The cross-boundary timeline measurement gate did not pass.
 
-The resulting position is deliberately conservative: no optimization mechanism
-is currently evidence-eligible.
+No optimization mechanism is currently evidence-eligible for release. The
+[research ledger](docs/research/README.md) links the historical studies and
+states the scope of each result. The [evidence-readiness calibration
+review](research/evidence-readiness/v1/report.md) records 24 matching synthetic
+measurement projections and a protocol nonconformance. Its overall gate is
+not established. No live-provider run, participant pilot, or production report
+was created.
 
-## Research trail, not marketing
+## Documentation and development
 
-Inlay is a first public research/measurement prototype. Its evidence is
-profile- and task-specific. It makes no general multi-harness claim and no
-claim of token, cost, latency, or tool-call reduction. Future work requires a
-new, mechanism-specific preservation contract and successful control/treatment
-evidence before a transformation is implemented.
-
-Negative results are retained on purpose: ObservationPack,
-Evidence-Preserving Reducer, and Online Context Compaction were not
-evidence-eligible for the observed Codex trajectory; Action Fusion v1 failed
-its capability gate; and the cross-boundary timeline measurement gate did not
-pass. Those are research findings, not features quietly swept under the rug.
-
-## Repository map
-
-```text
-src/              transparent transport, observation, and metrics
-extensions/       explicitly loaded Pi research adapters
-scripts/          reproducible C2 topology preflight
-test/             transport, lifecycle, privacy, and topology checks
-assets/           repository-owned visual identity
-```
-
-## Development
+See the [documentation index](docs/README.md) for project and research records.
 
 ```powershell
 pnpm install --frozen-lockfile
@@ -202,14 +126,5 @@ pnpm typecheck
 git diff --check
 ```
 
-CI runs the frozen install, test suite, and typecheck for every push and pull
-request.
-
-## Research provenance
-
-The full, sanitized experimental trail lives in a separate private research
-archive so this repository stays focused on a small runnable middleware
-baseline. The public claims above remain intentionally narrow: routing and
-bounded measurement are demonstrated for the stated profiles; semantic
-redundancy, removability, token savings, cost savings, and latency improvement
-are not.
+CI runs the frozen install, test suite, and typecheck for pushes and pull
+requests.

@@ -1,0 +1,370 @@
+[
+  {
+    "id": "C01",
+    "title": "Identity structure",
+    "comparison": "Compare the decoded input-item count within this captured identity request.",
+    "measurementScope": "captured_row",
+    "measurements": {
+      "structureObserved": true,
+      "inputItems": 1,
+      "encoding": "identity"
+    },
+    "evidence": [
+      "proxy.test.ts:54,66,76",
+      "calibration C01"
+    ]
+  },
+  {
+    "id": "C02",
+    "title": "Zstd structure",
+    "comparison": "Compare decoded input-item count within this captured zstd request.",
+    "measurementScope": "captured_row",
+    "measurements": {
+      "structureObserved": true,
+      "inputItems": 1,
+      "encoding": "zstd",
+      "wirePreserved": true
+    },
+    "evidence": [
+      "proxy.test.ts:481",
+      "calibration C02"
+    ]
+  },
+  {
+    "id": "C03",
+    "title": "Explicit numeric zero",
+    "comparison": "Compare the encountered cached-input-token number in this captured SSE observation.",
+    "measurementScope": "captured_row",
+    "measurements": {
+      "inputTokens": 12,
+      "outputTokens": 8,
+      "totalTokens": 20,
+      "cachedInputTokens": 0
+    },
+    "evidence": [
+      "proxy.test.ts:241",
+      "calibration C03"
+    ]
+  },
+  {
+    "id": "C04",
+    "title": "Local timing fields",
+    "comparison": "Compare availability of local header, first-body and duration measurements for this captured exchange.",
+    "measurementScope": "captured_row",
+    "measurements": {
+      "headerTimingObserved": true,
+      "firstBodyTimingObserved": true,
+      "durationObserved": true
+    },
+    "evidence": [
+      "proxy.test.ts:241",
+      "calibration C04"
+    ]
+  },
+  {
+    "id": "C05",
+    "title": "Canonical recurrence",
+    "comparison": "Compare exact canonical recurrence of this item across two local observations.",
+    "measurementScope": "process_local",
+    "measurements": {
+      "recurrenceCompared": 1,
+      "recurrencePreviouslySeen": 1,
+      "recurrenceIncomplete": false
+    },
+    "evidence": [
+      "proxy.test.ts:86,146",
+      "calibration C05"
+    ]
+  },
+  {
+    "id": "C06",
+    "title": "Cancellation relative to marker",
+    "comparison": "Distinguish a recorded cancellation after the recognized completion marker from one before it.",
+    "measurementScope": "captured_row",
+    "measurements": {
+      "pipelineCompleted": false,
+      "cancelled": true,
+      "cancelledAfterMarker": true,
+      "completionMarkerObserved": true
+    },
+    "evidence": [
+      "proxy.test.ts:376",
+      "calibration C06"
+    ]
+  },
+  {
+    "id": "C07",
+    "title": "Subset of usage fields",
+    "comparison": "Compare both encountered input and output token numbers for this captured observation.",
+    "measurementScope": "captured_row",
+    "measurements": {
+      "inputTokens": 12,
+      "outputTokens": null,
+      "totalTokens": null,
+      "cachedInputTokens": null
+    },
+    "evidence": [
+      "calibration C07"
+    ]
+  },
+  {
+    "id": "C08",
+    "title": "Numeric filtering",
+    "comparison": "Compare the full encountered input, output, total and cached-token tuple.",
+    "measurementScope": "captured_row",
+    "measurements": {
+      "inputTokens": 12,
+      "outputTokens": null,
+      "totalTokens": null,
+      "cachedInputTokens": 0
+    },
+    "evidence": [
+      "calibration C08"
+    ]
+  },
+  {
+    "id": "C09",
+    "title": "Oversized pending SSE",
+    "comparison": "Compare both observed response-byte presence and completion-marker coverage after the pending-buffer cap.",
+    "measurementScope": "captured_row",
+    "measurements": {
+      "responseBytesObserved": true,
+      "firstBodyTimingObserved": true,
+      "knownParserIncomplete": true,
+      "completionMarkerObserved": false
+    },
+    "evidence": [
+      "proxy.test.ts:422",
+      "calibration C09"
+    ]
+  },
+  {
+    "id": "C10",
+    "title": "Unterminated final frame",
+    "comparison": "Compare both byte arrival and complete observation of the final SSE frame.",
+    "measurementScope": "captured_row",
+    "measurements": {
+      "responseBytesObserved": true,
+      "knownParserIncomplete": true,
+      "completionMarkerObserved": false
+    },
+    "evidence": [
+      "proxy.test.ts:451",
+      "calibration C10"
+    ]
+  },
+  {
+    "id": "C11",
+    "title": "Evicted metric row",
+    "comparison": "Compare lifetime recorded count and the status distribution of all recorded exchanges.",
+    "measurementScope": "recorded_population",
+    "measurements": {
+      "recordedCount": 101,
+      "retainedCount": 100
+    },
+    "evidence": [
+      "proxy.test.ts:31",
+      "calibration C11"
+    ]
+  },
+  {
+    "id": "C12",
+    "title": "Recurrence capacity",
+    "comparison": "Compare observed recurrence counts and an exhaustive list of recurring groups.",
+    "measurementScope": "process_local",
+    "measurements": {
+      "recurrencePreviouslySeen": 65,
+      "recurrenceIncomplete": true,
+      "recurringGroups": 65,
+      "exposedGroups": 64,
+      "recurringGroupsTruncated": true
+    },
+    "evidence": [
+      "calibration C12"
+    ]
+  },
+  {
+    "id": "C13",
+    "title": "Absent numeric usage",
+    "comparison": "Compare encountered input/output token numbers when no numeric usage fields were retained.",
+    "measurementScope": "captured_row",
+    "measurements": {
+      "inputTokens": null,
+      "outputTokens": null,
+      "totalTokens": null,
+      "cachedInputTokens": null
+    },
+    "evidence": [
+      "calibration C13"
+    ]
+  },
+  {
+    "id": "C14",
+    "title": "Unsupported structural encoding",
+    "comparison": "Compare decoded canonical structure for a gzip-encoded request.",
+    "measurementScope": "captured_row",
+    "measurements": {
+      "structureObserved": false,
+      "structureUnavailableReason": "content_encoded",
+      "encoding": "gzip",
+      "wirePreserved": true
+    },
+    "evidence": [
+      "calibration C14"
+    ]
+  },
+  {
+    "id": "C15",
+    "title": "Malformed zstd",
+    "comparison": "Compare decoded canonical structure for the supplied malformed zstd fixture.",
+    "measurementScope": "captured_row",
+    "measurements": {
+      "structureObserved": false,
+      "structureUnavailableReason": "zstd_decode_failed",
+      "encoding": "zstd",
+      "wirePreserved": true
+    },
+    "evidence": [
+      "proxy.test.ts:535",
+      "calibration C15"
+    ]
+  },
+  {
+    "id": "C16",
+    "title": "Zstd output limit",
+    "comparison": "Compare decoded canonical structure after the bounded decompression output limit.",
+    "measurementScope": "captured_row",
+    "measurements": {
+      "structureObserved": false,
+      "structureUnavailableReason": "zstd_output_limit",
+      "encoding": "zstd",
+      "wirePreserved": true
+    },
+    "evidence": [
+      "proxy.test.ts:612",
+      "calibration C16"
+    ]
+  },
+  {
+    "id": "C17",
+    "title": "No observed body byte",
+    "comparison": "Compare first-response-body-byte timing for an empty response body.",
+    "measurementScope": "captured_row",
+    "measurements": {
+      "status": 204,
+      "pipelineCompleted": true,
+      "headerTimingObserved": true,
+      "firstBodyTimingObserved": false
+    },
+    "evidence": [
+      "calibration C17"
+    ]
+  },
+  {
+    "id": "C18",
+    "title": "Failed external task contract",
+    "comparison": "Accept a task-preserved comparison with the declared failing external verifier.",
+    "measurementScope": "external_contract",
+    "measurements": {
+      "status": 200,
+      "completionMarkerObserved": true,
+      "verifier": "FAIL",
+      "scope": "PASS",
+      "harnessCompletion": "PASS"
+    },
+    "evidence": [
+      "calibration C18",
+      "historical independent verifier contract"
+    ]
+  },
+  {
+    "id": "C19",
+    "title": "Origin of missing usage",
+    "comparison": "Attribute absent numeric usage to provider omission rather than ignored malformed SSE.",
+    "measurementScope": "captured_row",
+    "measurements": {
+      "inputTokens": null,
+      "outputTokens": null,
+      "totalTokens": null,
+      "cachedInputTokens": null,
+      "knownParserIncomplete": false,
+      "completionMarkerObserved": false
+    },
+    "evidence": [
+      "calibration C19 paired-world equality"
+    ]
+  },
+  {
+    "id": "C20",
+    "title": "Unrecognized terminal family",
+    "comparison": "Distinguish provider response.failed from response.incomplete using retained lifecycle facts.",
+    "measurementScope": "captured_row",
+    "measurements": {
+      "status": 200,
+      "pipelineCompleted": true,
+      "completionMarkerObserved": false,
+      "knownParserIncomplete": false
+    },
+    "evidence": [
+      "calibration C20 paired-world equality"
+    ]
+  },
+  {
+    "id": "C21",
+    "title": "Zero recorded outcomes",
+    "comparison": "Infer that no supported request was attempted from an empty metric window and zero recorded count.",
+    "measurementScope": "recorded_population",
+    "measurements": {
+      "recordedCount": 0,
+      "retainedCount": 0
+    },
+    "evidence": [
+      "calibration C21 paired-world equality"
+    ]
+  },
+  {
+    "id": "C22",
+    "title": "Stable captured window",
+    "comparison": "Declare whole-run capture complete because two metric snapshots are stable and untruncated.",
+    "measurementScope": "whole_run",
+    "measurements": {
+      "recordedCount": 1,
+      "retainedCount": 1,
+      "snapshotsStable": true
+    },
+    "evidence": [
+      "calibration C22 in-flight paired-world equality"
+    ]
+  },
+  {
+    "id": "C23",
+    "title": "Repeated requests",
+    "comparison": "Count retries rather than independent requests from two matching request observations.",
+    "measurementScope": "recorded_population",
+    "measurements": {
+      "recordedCount": 2,
+      "retainedCount": 2,
+      "retryFieldPresent": false
+    },
+    "evidence": [
+      "calibration C23 observational equivalence"
+    ]
+  },
+  {
+    "id": "C24",
+    "title": "Task outcome from transport",
+    "comparison": "Establish task verifier, allowed scope and harness completion using successful transport facts alone.",
+    "measurementScope": "whole_run",
+    "measurements": {
+      "status": 200,
+      "pipelineCompleted": true,
+      "completionMarkerObserved": true,
+      "verifier": "UNAVAILABLE",
+      "scope": "UNAVAILABLE",
+      "harnessCompletion": "UNAVAILABLE"
+    },
+    "evidence": [
+      "calibration C24 omitted-sidecar equivalence"
+    ]
+  }
+]
