@@ -1,0 +1,13 @@
+{
+  "protocolVersion": "ERR-CAL-1",
+  "frozenOn": "2026-10-09",
+  "baseline": "97a1047961cacdb6b44d2b13ee81ae5c97690b55",
+  "files": {
+    "design-review.md": "a9f7d6c6c7a00f895fd8c13b59d150a55cb85cb4d1505b58738bf6a26175d069",
+    "protocol.md": "3ece20badda9c8f029b939605a64468a67d84a674820e90910e63c60fac71ce6",
+    "case-schema.json": "28084b50edb087b4185089e0f3e21f072a030f70032c4fc8b1ed535c7aec6460",
+    "cases.json": "073cc6f68b06360600cff8daf3a05f1eaf24f7bb9db775f3a27999eba086a8db",
+    "answer-key.json": "b6ac5dc1b912af762552be90613644546aad0a46363c1f9099ed41f493d116b8",
+    "fixtures.ts": "565fbf56febbbb1e47531e188fff878cfe7afdbc254220bcdddee0526be22674"
+  }
+}

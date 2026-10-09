@@ -1,0 +1,15 @@
+{
+  "protocolVersion": "ERR-CAL-1",
+  "runnerStatus": "PASS",
+  "measurementMatches": 24,
+  "fixedChecksPassed": 79,
+  "protocolGate": "NOT_ESTABLISHED",
+  "reviewDisposition": "HOLD_FOR_PROTOCOL_REVISION",
+  "nonconformantCases": ["C24"],
+  "declarationOnlyOutcomeCases": ["C18", "C23", "C24"],
+  "preExecutionRunnerFreeze": false,
+  "difficultyStratificationImplemented": false,
+  "liveRuns": 0,
+  "participantRuns": 0,
+  "productionReportImplemented": false
+}
