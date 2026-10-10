@@ -24,3 +24,46 @@ jobs:
       - run: pnpm install --frozen-lockfile
       - run: pnpm test
       - run: pnpm typecheck
+      - name: Verify source release candidate
+        shell: bash
+        run: |
+          set -euo pipefail
+          candidate="$RUNNER_TEMP/inlay-release"
+          version=$(node -p "require('./package.json').version")
+          mkdir -p "$candidate/assets" "$candidate/extracted"
+          git archive --format=tar.gz --prefix="inlay-$version/" --output="$candidate/assets/inlay-$version-source.tar.gz" HEAD
+          tar -xzf "$candidate/assets/inlay-$version-source.tar.gz" -C "$candidate/extracted"
+          cd "$candidate/extracted/inlay-$version"
+          pnpm install --frozen-lockfile
+          pnpm test
+          pnpm typecheck
+          node scripts/release-smoke.mjs
+          cd "$GITHUB_WORKSPACE"
+          export RELEASE_ASSETS="$candidate/assets"
+          node --input-type=module <<'NODE'
+          import { readFileSync, writeFileSync } from "node:fs";
+          import { execFileSync } from "node:child_process";
+          import { createHash } from "node:crypto";
+          import { join } from "node:path";
+          const git = (...args) => execFileSync("git", args, { encoding: "utf8" }).trim();
+          const sha = (bytes) => createHash("sha256").update(bytes).digest("hex");
+          const { version } = JSON.parse(readFileSync("package.json", "utf8"));
+          const archive = "inlay-" + version + "-source.tar.gz";
+          const result = {
+            version, sourceCommit: git("rev-parse", "HEAD"), sourceTree: git("rev-parse", "HEAD^{tree}"),
+            archive, archiveSha256: sha(readFileSync(join(process.env.RELEASE_ASSETS, archive))),
+            lockfileSha256: sha(readFileSync("pnpm-lock.yaml")),
+            node: process.version, pnpm: execFileSync("pnpm", ["--version"], { encoding: "utf8" }).trim(),
+            checks: { frozenInstall: "PASS", tests: "PASS", typecheck: "PASS", cliStartup: "PASS" },
+            scope: "Extracted source archive; deterministic synthetic tests and unconfigured loopback CLI; no live provider or user-benefit validation",
+          };
+          writeFileSync(join(process.env.RELEASE_ASSETS, "release-verification.json"), JSON.stringify(result, null, 2) + "\n");
+          NODE
+          cd "$candidate/assets"
+          sha256sum "inlay-$version-source.tar.gz" release-verification.json > SHA256SUMS
+      - uses: actions/upload-artifact@v4
+        with:
+          name: source-release-${{ github.sha }}
+          path: ${{ runner.temp }}/inlay-release/assets/*
+          if-no-files-found: error
+          retention-days: 14

@@ -2,6 +2,45 @@
 
 All notable changes to this research prototype are documented here.
 
+## v0.2.0 — Local Exchange Lifecycle
+
+### Delivered
+
+- Process-local `exchangeLifecycle` accounting in `GET /metrics`: admitted
+  handlers, active handlers, actual local forwarding invocations and normal
+  callback finalization. Developers can inspect pending supported work even
+  when the outcome store is empty or stable.
+- Bounded aggregate state with explicit unavailable/null counts; no added
+  per-request lifecycle records or raw workload retention.
+
+### Evidence
+
+- LEA-2 matched seven included synthetic cases, including three disconnect
+  trials and reversed concurrent completion on unchanged v0.1.0.
+- LEA-3 production verification passed 46 tests, including all 36 release
+  regressions, plus typecheck and Node 22.15.0 CI.
+- Release publication requires the clean archive installation, test, typecheck
+  and CLI startup gates in [release discipline](docs/releases.md). The published
+  release's verification asset records the exact commit and archive checksum.
+
+### Compatibility and limitations
+
+- Existing configuration, dependencies, outcome fields and transport behavior
+  remain unchanged. No storage migration; exact-key metrics clients must accept
+  the additive `exchangeLifecycle` property.
+- Unexpected observation-exception finalization and callback rejection
+  preservation remain UNAVAILABLE. Aggregate forwarding cannot identify which
+  active handler forwarded. No task-success, provider-receipt, retry, delivery,
+  reliability, user-benefit or efficiency claim is established.
+- GitHub source release only; no npm publication. Node minimum remains 22.15.0.
+
+### Milestone decision
+
+LEA-3's technical build is complete. Recommend LIMITED FIELD VALIDATION of the
+existing pending-work diagnostic before any further capability is built.
+Synthetic correctness is demonstrated; measured developer benefit is not.
+No field study or new experiment is started by this release.
+
 ## v0.1.0 — Evidence Baseline
 
 ### Added
