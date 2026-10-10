@@ -5,8 +5,14 @@
 - Add process-local lifecycle counters to `GET /metrics`: admitted, active,
   local forwarding invocations and normally finalized handlers.
 - Add regression coverage for normal, failure, streaming, disconnect and
-  concurrent-handler paths. The suite contains 46 tests, including the
-  36 existing release tests.
+  concurrent-handler paths. The complete suite contains 54 tests, including
+  all 46 tests preceding the SSE correction.
+- Correct SSE observation buffering so tested identical supported streams retain
+  the same non-timing observations across chunk partitions. Preserve the frame
+  cap and discard oversized frames through their delimiter before observing
+  later frames.
+- Add permanent differential regressions, including the reproduced 78,140-byte
+  coalesced stream, and exact-limit, unfinished-input and oversized-suffix checks.
 - Add extracted-source archive verification and provider-free startup checks.
 - Document the additive metrics property and its availability/privacy limits.
   Existing configuration, dependencies and outcome definitions are unchanged.

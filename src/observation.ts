@@ -392,6 +392,8 @@ function extractUsage(value: unknown): ProviderUsage | undefined {
 export class ResponsesStreamObserver {
   #decoder = new StringDecoder("utf8");
   #pending = "";
+  #delimiterTail = "";
+  #discardingOversizedEvent = false;
   #responseBytes = 0;
   #timeToFirstResponseBodyByteMs: number | undefined;
   #timeToTerminalEventMs: number | undefined;
@@ -405,20 +407,31 @@ export class ResponsesStreamObserver {
       this.#timeToFirstResponseBodyByteMs = elapsedMs;
     }
 
-    this.#pending += this.#decoder.write(chunk);
-    if (this.#pending.length > MAX_SSE_EVENT_CHARS) {
-      this.#responseObservationIncomplete = true;
-      this.#pending = "";
-      return;
-    }
+    const decoded = this.#decoder.write(chunk);
+    for (let index = 0; index < decoded.length; index += 1) {
+      const character = decoded[index];
+      // Fixed-size framing state survives discarded content and chunk boundaries.
+      this.#delimiterTail = (this.#delimiterTail + character).slice(-4);
+      const delimiter = /\r?\n\r?\n$/.exec(this.#delimiterTail);
 
-    for (;;) {
-      const boundary = this.#pending.search(/\r?\n\r?\n/);
-      if (boundary === -1) return;
-      const event = this.#pending.slice(0, boundary);
-      const boundaryLength = this.#pending.startsWith("\r\n", boundary) ? 4 : 2;
-      this.#pending = this.#pending.slice(boundary + boundaryLength);
-      this.#observeEvent(event, elapsedMs);
+      if (!this.#discardingOversizedEvent) {
+        if (this.#pending.length === MAX_SSE_EVENT_CHARS) {
+          this.#responseObservationIncomplete = true;
+          this.#pending = "";
+          this.#discardingOversizedEvent = true;
+        } else {
+          this.#pending += character;
+        }
+      }
+
+      if (delimiter) {
+        if (!this.#discardingOversizedEvent) {
+          this.#observeEvent(this.#pending.slice(0, -delimiter[0].length), elapsedMs);
+        }
+        this.#pending = "";
+        this.#delimiterTail = "";
+        this.#discardingOversizedEvent = false;
+      }
     }
   }
 
@@ -435,11 +448,13 @@ export class ResponsesStreamObserver {
 
   /** Marks a final unterminated SSE frame as unavailable without affecting forwarded bytes. */
   finish(): void {
-    this.#pending += this.#decoder.end();
-    if (this.#pending !== "") {
+    const decoderTail = this.#decoder.end();
+    if (this.#pending !== "" || decoderTail !== "" || this.#discardingOversizedEvent) {
       this.#responseObservationIncomplete = true;
-      this.#pending = "";
     }
+    this.#pending = "";
+    this.#delimiterTail = "";
+    this.#discardingOversizedEvent = false;
   }
 
   #observeEvent(event: string, elapsedMs: number): void {

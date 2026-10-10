@@ -105,3 +105,27 @@ route exclusion, separate server lifetimes and conservative unavailable states.
 The existing [release tests](../test/) continue to cover transport, observation,
 privacy, recurrence and topology. Synthetic behavior checks do not demonstrate
 report usefulness or efficiency.
+
+## SSE observation consistency
+
+The unreleased patch corrects chunk-dependent observation loss in the existing
+Responses observer. Regression checks compare identical synthetic bytes delivered
+whole, byte by byte, at event/data/JSON boundaries and in mixed partitions. They
+include a 78,140-byte stream of small frames. Only first-body-byte and terminal
+arrival timings are excluded from snapshot equality.
+
+The existing limit is 65,536 UTF-16 code units per reconstructed frame, including
+its blank-line delimiter. LF and CRLF delimiters and split UTF-8 characters are
+covered. An oversized frame is discarded through its delimiter; subsequent
+bounded frames can be observed, while `responseObservationIncomplete` stays true.
+Normal finish with an unfinished frame also sets that flag. On interruption,
+the existing snapshot path does not finalize the parser; `false` therefore does
+not establish exhaustive observation. Missing usage is not zero.
+
+[Focused regressions](../test/responses-stream.test.ts) exercise partition equality,
+usage merging, terminal recognition, malformed data, unfinished input and the
+exact size limit. They establish behavior for these supported synthetic paths,
+not arbitrary SSE compatibility, response completeness, provider correctness,
+task success, performance or savings. Bare-CR framing remains unsupported.
+Forwarded bytes, configuration, observation fields and event interpretation are
+unchanged.
