@@ -31,8 +31,10 @@ function cutsAt(bytes: Buffer, offsets: number[]) {
   const chunks: Buffer[] = [];
   let previous = 0;
   for (const offset of offsets) {
-    if (offset > previous && offset < bytes.length) chunks.push(bytes.subarray(previous, offset));
-    previous = offset;
+    if (offset > previous && offset < bytes.length) {
+      chunks.push(bytes.subarray(previous, offset));
+      previous = offset;
+    }
   }
   if (previous < bytes.length) chunks.push(bytes.subarray(previous));
   return chunks;
@@ -71,7 +73,10 @@ test("supported LF and CRLF streams produce partition-independent snapshots", ()
       [`${newline} mixed partitions`, cutsAt(bytes, [1, 7, 23, 48, 83, 121, 177, 233, bytes.length - 3])],
     ];
     assertSameStableSnapshot(bytes, partitions);
-    assert.deepEqual(withoutTiming(observe([bytes])), expectedSmallProjection, `${newline} expected projection`);
+    assert.deepEqual(withoutTiming(observe([bytes])), {
+      ...expectedSmallProjection,
+      responseBytes: bytes.length,
+    }, `${newline} expected projection`);
   }
 });
 
