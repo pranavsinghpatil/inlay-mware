@@ -140,6 +140,22 @@ In plain English: Inlay can expose *structure and transport behavior*; it
 cannot see whether an item is semantically redundant, whether model reasoning
 is wasted, or whether a rewrite would preserve provider cache behavior.
 
+## Local Exchange Lifecycle
+
+`GET /metrics` now adds `exchangeLifecycle`: admitted handlers, currently active
+handlers, cumulative local forwarding invocations and finalized handlers.
+This can reveal pending supported work while the outcome store is empty or
+stable. It is available independently of opt-in structural observation.
+
+A terminal SSE event does not finalize a handler; the original callback must
+settle normally. Counters are local to one server instance and retain no
+per-request lifecycle records. They do not establish task success, provider
+receipt, logical retries, complete delivery, abnormal finalization or semantic
+agent stages. Cumulative forwarding cannot identify which active handler forwarded.
+
+See the [measurement inventory](docs/measurements.md) for field definitions,
+availability, concurrency, privacy and the scoped synthetic evidence.
+
 ## Privacy boundary
 
 Inlay does not persist raw request or response bodies. Structural decoding is

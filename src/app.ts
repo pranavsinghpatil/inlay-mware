@@ -4,6 +4,7 @@ import { createServer, type IncomingMessage, type Server, type ServerResponse } 
 import type { ProxyConfig } from "./config.ts";
 import { copyResponseHeaders, forwardHeaders, readBody, sendJson } from "./http.ts";
 import { MetricsStore } from "./metrics.ts";
+import { ExchangeLifecycle } from "./exchange-lifecycle.ts";
 import {
   deriveResponsesRequestStructure,
   ExactItemRecurrenceTracker,
@@ -14,6 +15,24 @@ import {
 
 type SupportedUpstreamPath = "chat/completions" | "responses";
 type IncomingRoute = "/v1/chat/completions" | "/v1/responses" | "/v1/codex/responses";
+
+function isSupportedExchange(request: IncomingMessage): boolean {
+  return request.method === "POST" && (
+    request.url === "/v1/chat/completions"
+    || request.url === "/v1/responses"
+    || request.url === "/v1/codex/responses"
+  );
+}
+
+function invokeUpstreamFetch(
+  lifecycle: ExchangeLifecycle,
+  fetchImplementation: typeof fetch,
+  input: Parameters<typeof fetch>[0],
+  init?: Parameters<typeof fetch>[1],
+): ReturnType<typeof fetch> {
+  lifecycle.forward();
+  return fetchImplementation(input, init);
+}
 
 /** Converts elapsed stream facts into local wall-clock timestamps for one opt-in experiment. */
 function contentFreeTimeline(
@@ -42,6 +61,7 @@ function requestContentEncoding(request: IncomingMessage): "identity" | "br" | "
 async function forwardModelRequest(
   config: ProxyConfig,
   metrics: MetricsStore,
+  lifecycle: ExchangeLifecycle,
   request: IncomingMessage,
   response: ServerResponse,
   upstreamPath: SupportedUpstreamPath,
@@ -106,7 +126,7 @@ async function forwardModelRequest(
   const responseObserver = observe ? new ResponsesStreamObserver() : undefined;
   try {
     const upstreamUrl = new URL(upstreamPath, `${config.upstreamBaseUrl.href.replace(/\/$/, "")}/`);
-    const upstream = await fetch(upstreamUrl, {
+    const upstream = await invokeUpstreamFetch(lifecycle, fetch, upstreamUrl, {
       method: "POST",
       headers: forwardHeaders(request.headers, body.requestId),
       body: new Uint8Array(body.bytes),
@@ -215,10 +235,11 @@ async function forwardModelRequest(
 }
 
 export function createInlayServer(config: ProxyConfig, metrics = new MetricsStore()): Server {
+  const exchangeLifecycle = new ExchangeLifecycle();
   const recurrenceTracker = config.recurrenceProbe === "exact-item"
     ? new ExactItemRecurrenceTracker(config.semanticInspection === "role-categories")
     : undefined;
-  return createServer(async (request, response) => {
+  async function handleRequest(request: IncomingMessage, response: ServerResponse): Promise<void> {
     if (request.method === "GET" && request.url === "/health") {
       sendJson(response, 200, { status: "ok", upstreamConfigured: Boolean(config.upstreamBaseUrl), mode: "transparent" });
       return;
@@ -226,22 +247,37 @@ export function createInlayServer(config: ProxyConfig, metrics = new MetricsStor
     if (request.method === "GET" && request.url === "/metrics") {
       sendJson(response, 200, {
         ...metrics.snapshot(),
+        exchangeLifecycle: exchangeLifecycle.snapshot(),
         ...(recurrenceTracker ? { exactItemRecurrence: recurrenceTracker.snapshot() } : {}),
       });
       return;
     }
     if (request.method === "POST" && request.url === "/v1/chat/completions") {
-      await forwardModelRequest(config, metrics, request, response, "chat/completions", "/v1/chat/completions", recurrenceTracker);
+      await forwardModelRequest(config, metrics, exchangeLifecycle, request, response, "chat/completions", "/v1/chat/completions", recurrenceTracker);
       return;
     }
     if (request.method === "POST" && request.url === "/v1/responses") {
-      await forwardModelRequest(config, metrics, request, response, "responses", "/v1/responses", recurrenceTracker);
+      await forwardModelRequest(config, metrics, exchangeLifecycle, request, response, "responses", "/v1/responses", recurrenceTracker);
       return;
     }
     if (request.method === "POST" && request.url === "/v1/codex/responses") {
-      await forwardModelRequest(config, metrics, request, response, "responses", "/v1/codex/responses", recurrenceTracker);
+      await forwardModelRequest(config, metrics, exchangeLifecycle, request, response, "responses", "/v1/codex/responses", recurrenceTracker);
       return;
     }
     sendJson(response, 404, { error: { code: "inlay_route_not_found", message: "Supported routes: GET /health, GET /metrics, POST /v1/chat/completions, POST /v1/responses, POST /v1/codex/responses." } });
+  }
+
+  return createServer((request, response) => {
+    const admitted = isSupportedExchange(request);
+    if (admitted) exchangeLifecycle.admit();
+    const originalCallbackPromise = handleRequest(request, response);
+    if (!admitted) return originalCallbackPromise;
+    return originalCallbackPromise.then(
+      () => exchangeLifecycle.finalize(),
+      (error: unknown) => {
+        exchangeLifecycle.invalidate("callback_rejection");
+        throw error;
+      },
+    );
   });
 }
