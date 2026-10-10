@@ -1,72 +1,68 @@
-# Releases
+# Release policy
 
-Inlay distributes GitHub source releases. `private: true` prevents npm
-publication; a release is not an npm package or a general harness-support claim.
+Inlay distributes source releases through GitHub. `private: true` prevents npm
+publication. The latest accepted release is v0.1.0.
 
-## Version decisions
+## Version approval
 
-The first release was `v0.1.0`; it had no written increment policy. From
-`v0.2.0`, use [Semantic Versioning](https://semver.org/) numbering with this
-explicit initial-development convention:
+During initial development, small compatible maintenance and instrumentation
+updates remain within the 0.1.x line. A minor-version increase requires an
+explicitly approved product milestone with evidence proportionate to its claim.
+Test counts and technical correctness alone do not establish that milestone.
 
-- Increase the minor version for a meaningful new capability or an incompatible
-  contract change. Describe any incompatibility and migration in the notes.
-- Increase the patch version for compatible corrections and documentation fixes.
-- Keep the major version at zero until a reviewed stable public contract exists.
-- Never move or rewrite a published tag or replace its artifact bytes.
+The lifecycle instrumentation update is proposed as **v0.1.1**, pending release
+approval. It does not add an optimization or establish measured developer benefit.
 
-LEA-3 adds a compatible metrics property and a new diagnostic capability.
-The LEA-3 version decision assigns `v0.2.0`, rather than a patch to the
-`v0.1.0` evidence baseline.
+The previously published v0.2.0 designation has been withdrawn. Its tag and
+artifact bytes are retained as historical records, and its release entry is
+excluded from the accepted release channel. Tags and published artifacts must
+not be moved, overwritten or silently relabeled.
 
-## Release gate
+## Publication requirements
 
-One active milestone ends in a reviewed PR and a release record. Before tagging:
+1. Agree the release scope and proposed version before publication.
+2. Review the exact changes, compatibility, configuration, public documentation
+   and known limitations. Resolve review blockers and pass applicable CI.
+3. Validate the final source commit as an extracted archive: frozen installation,
+   complete tests, typecheck and provider-free CLI startup on the supported Node
+   baseline.
+4. Verify the archive, provenance record and checksums against that exact commit.
+5. Obtain explicit approval to publish the proposed version. Create its tag and
+   upload the same verified bytes; verify the published downloads.
 
-1. Review the exact commit, changed files, open review threads and applicable
-   repository rules. Resolve blockers within scope; require passing CI.
-2. Review runtime/configuration/API compatibility, Node support, installation,
-   documentation, upgrade notes and evidence limits.
-3. On the final main commit, CI must archive tracked source, extract it into a
-   fresh directory, install with the frozen lockfile, and pass the complete test
-   suite, typecheck and unconfigured CLI startup smoke. No provider is contacted.
-4. Download that run's source archive, `release-verification.json` and
-   `SHA256SUMS`. Verify checksums, exact source commit, version and successful
-   checks before publication. Attach those same bytes to the GitHub release.
-5. Create the tag at that verified commit. Record delivered value, evidence,
-   limitations and milestone decision in the release notes; verify the published
-   tag and downloadable checksums. Do not claim publication before it succeeds.
+A passing candidate remains unreleased until publication is approved. Changes
+after verification require a new candidate check. Release notes must state the
+change, compatibility, verification and limitations in factual terms.
+Internal research decisions and speculative roadmap claims belong in private
+working documentation.
 
-CI candidate artifacts are temporary validation outputs, not published releases.
-A failed gate means HOLD FOR CORRECTION; no tag or publication. Any change to the
-candidate commit requires verification of a new archive.
+## Installation
 
-## Install and upgrade
+Use Node `>=22.15.0` and pnpm `10.11.0`. CI checks Node `22.15.0` on Linux.
+The source distribution includes the lockfile and requires development
+dependencies for its source execution and verification tools.
 
-Use Node `>=22.15.0` and pnpm `10.11.0`. CI tests Node `22.15.0` on Linux.
-The release includes TypeScript source, tests and the lockfile; install
-development dependencies because Node executes source directly.
-
-Download the source archive and `SHA256SUMS` from the selected release. Verify
-its SHA-256, extract it, then run from the extracted `inlay-VERSION/` directory:
+The accepted v0.1.0 release has no separately attached verification assets.
+Install from its tag using the [README instructions](../README.md). For future
+approved releases with attached source archives, verify the supplied
+`SHA256SUMS`, extract the archive and run:
 
 ```sh
 pnpm install --frozen-lockfile
 pnpm start
 ```
 
-Without `INLAY_UPSTREAM_BASE_URL`, health and metrics work and supported POST
-routes return 503. For forwarding, supply the existing upstream configuration
-described in the [README](../README.md). Inlay does not read `.env` files
-automatically; set variables in the launching process. Harness authentication
-remains owned by the harness.
+Set configuration in the launching environment; `.env` files are not loaded
+automatically. Without an upstream URL, health and metrics work and supported
+POST requests return 503. Authentication remains owned by the harness.
 
-Upgrading from `v0.1.0` requires no configuration or storage migration.
-`/metrics.exchangeLifecycle` is additive and always on; clients enforcing exact
-JSON keys must accept the new field. Counters reset with the server instance;
-old outcome fields and retention keep their meanings. Never use a zero or a
-missing field to stand in for `UNAVAILABLE`.
+## Proposed patch compatibility
 
-A new build or experiment requires a demonstrated need and explicit scope.
-The current recommendation is limited field validation of the shipped
-pending-work diagnostic, with no new telemetry or study started automatically.
+The lifecycle update requires no configuration or storage migration.
+`/metrics.exchangeLifecycle` is additive and always on; clients that enforce
+exact JSON keys must accept the new property. Counts reset with the server
+instance. Existing outcome fields, dependencies and retention are unchanged.
+
+Unexpected observation-exception finalization remains unavailable. Aggregate
+forwarding cannot identify which active handler forwarded. No task, retry,
+provider-receipt, efficiency or measured user-benefit claim is established.

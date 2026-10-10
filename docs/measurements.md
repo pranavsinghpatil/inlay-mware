@@ -1,5 +1,9 @@
 # Measurement inventory
 
+The lifecycle counters described here are implemented on main and proposed
+for the unreleased v0.1.1 patch. They are not part of the accepted v0.1.0
+release. The v0.2.0 designation was withdrawn.
+
 `GET /metrics` exposes local measurements. Existing outcome records, structural
 observation, recurrence, usage and Pi measurements keep their v0.1.0 meanings.
 

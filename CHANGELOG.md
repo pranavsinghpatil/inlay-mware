@@ -1,45 +1,27 @@
 # Changelog
 
-All notable changes to this research prototype are documented here.
+## Unreleased — proposed v0.1.1
 
-## v0.2.0 — Local Exchange Lifecycle
+- Add process-local lifecycle counters to `GET /metrics`: admitted, active,
+  local forwarding invocations and normally finalized handlers.
+- Add regression coverage for normal, failure, streaming, disconnect and
+  concurrent-handler paths. The suite contains 46 tests, including the
+  36 existing release tests.
+- Add extracted-source archive verification and provider-free startup checks.
+- Document the additive metrics property and its availability/privacy limits.
+  Existing configuration, dependencies and outcome definitions are unchanged.
 
-### Delivered
+This is a small instrumentation and release-maintenance update. It introduces
+no optimization mechanism. Cost, latency and token reductions, measured
+developer benefit and generalized reliability have not been established.
+Unexpected observation-exception finalization remains unavailable, and forwarding
+totals cannot identify which active handler forwarded. Publication is pending.
 
-- Process-local `exchangeLifecycle` accounting in `GET /metrics`: admitted
-  handlers, active handlers, actual local forwarding invocations and normal
-  callback finalization. Developers can inspect pending supported work even
-  when the outcome store is empty or stable.
-- Bounded aggregate state with explicit unavailable/null counts; no added
-  per-request lifecycle records or raw workload retention.
+## Withdrawn designation: v0.2.0
 
-### Evidence
-
-- LEA-2 matched seven included synthetic cases, including three disconnect
-  trials and reversed concurrent completion on unchanged v0.1.0.
-- LEA-3 production verification passed 46 tests, including all 36 release
-  regressions, plus typecheck and Node 22.15.0 CI.
-- Release publication requires the clean archive installation, test, typecheck
-  and CLI startup gates in [release discipline](docs/releases.md). The published
-  release's verification asset records the exact commit and archive checksum.
-
-### Compatibility and limitations
-
-- Existing configuration, dependencies, outcome fields and transport behavior
-  remain unchanged. No storage migration; exact-key metrics clients must accept
-  the additive `exchangeLifecycle` property.
-- Unexpected observation-exception finalization and callback rejection
-  preservation remain UNAVAILABLE. Aggregate forwarding cannot identify which
-  active handler forwarded. No task-success, provider-receipt, retry, delivery,
-  reliability, user-benefit or efficiency claim is established.
-- GitHub source release only; no npm publication. Node minimum remains 22.15.0.
-
-### Milestone decision
-
-LEA-3's technical build is complete. Recommend LIMITED FIELD VALIDATION of the
-existing pending-work diagnostic before any further capability is built.
-Synthetic correctness is demonstrated; measured developer benefit is not.
-No field study or new experiment is started by this release.
+The v0.2.0 designation was withdrawn because this update was not accepted as a
+minor-version product milestone. The original tag and artifacts remain unchanged
+for provenance. The latest accepted release remains v0.1.0.
 
 ## v0.1.0 — Evidence Baseline
 
