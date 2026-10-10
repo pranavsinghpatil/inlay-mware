@@ -20,7 +20,8 @@ coding harness → Inlay → configured upstream
 ## Release status
 
 The latest accepted release is [v0.1.0](https://github.com/pranavsinghpatil/inlay-mware/releases/tag/v0.1.0).
-The lifecycle instrumentation update on main is an **unreleased v0.1.1 patch
+The lifecycle instrumentation and SSE consistency correction on main are an
+**unreleased v0.1.1 patch
 candidate**. The previous v0.2.0 designation was withdrawn; its tag and artifacts
 remain available only as historical records.
 

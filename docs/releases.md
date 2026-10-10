@@ -10,8 +10,8 @@ updates remain within the 0.1.x line. A minor-version increase requires an
 explicitly approved product milestone with evidence proportionate to its claim.
 Test counts and technical correctness alone do not establish that milestone.
 
-The lifecycle instrumentation update is proposed as **v0.1.1**, pending release
-approval. It does not add an optimization or establish measured developer benefit.
+The lifecycle instrumentation and SSE observation correction are proposed as
+**v0.1.1**, pending release approval. It does not add an optimization or establish measured developer benefit.
 
 The previously published v0.2.0 designation has been withdrawn. Its tag and
 artifact bytes are retained as historical records, and its release entry is
@@ -66,3 +66,11 @@ instance. Existing outcome fields, dependencies and retention are unchanged.
 Unexpected observation-exception finalization remains unavailable. Aggregate
 forwarding cannot identify which active handler forwarded. No task, retry,
 provider-receipt, efficiency or measured user-benefit claim is established.
+
+The SSE correction adds no API fields or configuration. Identical supported SSE
+bytes now retain the same non-timing observations under tested fragmentation and
+coalescing. Previously lost terminal/usage observations can become present, and
+oversized suffixes no longer contribute observations. Consumers must continue to
+treat missing usage as unavailable and incomplete observation as a limitation,
+not a task result. The frame limit is unchanged; see the
+[measurement contract](measurements.md#sse-observation-consistency).
