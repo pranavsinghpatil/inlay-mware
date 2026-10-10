@@ -5,7 +5,7 @@
 
 <p align="center">
   <a href="https://github.com/pranavsinghpatil/inlay-mware/actions/workflows/ci.yml"><img src="https://github.com/pranavsinghpatil/inlay-mware/actions/workflows/ci.yml/badge.svg" alt="CI" /></a>
-  <a href="https://github.com/pranavsinghpatil/inlay-mware/releases/tag/v0.1.0"><img src="https://img.shields.io/github/v/release/pranavsinghpatil/inlay-mware?display_name=tag&sort=semver" alt="Release" /></a>
+  <a href="https://github.com/pranavsinghpatil/inlay-mware/releases/latest"><img src="https://img.shields.io/github/v/release/pranavsinghpatil/inlay-mware?display_name=tag&sort=semver" alt="Release" /></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-Apache--2.0-blue.svg" alt="License" /></a>
 </p> 
 
@@ -79,12 +79,12 @@ no raw diagnostic content.
 
 ## Run the validated transport locally
 
-Requirements: Node `>=22.15.0`, pnpm, and an already authenticated supported
+Requirements: Node `>=22.15.0`, pnpm `10.11.0`, and an already authenticated supported
 harness/provider profile. Inlay does not obtain, store, or configure provider
 credentials.
 
 ```powershell
-pnpm install
+pnpm install --frozen-lockfile
 $env:INLAY_UPSTREAM_BASE_URL = 'https://chatgpt.com/backend-api/codex'
 $env:INLAY_HOST = '127.0.0.1'
 $env:INLAY_PORT = '8787'
@@ -208,6 +208,11 @@ scripts/          reproducible C2 topology preflight
 test/             transport, lifecycle, privacy, and topology checks
 assets/           repository-owned visual identity
 ```
+
+## Releases and upgrades
+
+See [release discipline](docs/releases.md) for source-archive installation,
+version decisions, compatibility notes and verification requirements.
 
 ## Development
 
