@@ -336,4 +336,3 @@ export function isObservationTotals(value: unknown): value is ObservationTotals 
     && coverageMatchesOutcomes(recurrence.previouslySeenBytes, value.outcomes)
     && validFlags(recurrence.incomplete) && flagsMatchOutcomes(recurrence.incomplete, value.outcomes);
 }
-
