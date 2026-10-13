@@ -5,6 +5,7 @@ import type { ProxyConfig } from "./config.ts";
 import { copyResponseHeaders, forwardHeaders, readBody, sendJson } from "./http.ts";
 import { MetricsStore } from "./metrics.ts";
 import { ExchangeLifecycle } from "./exchange-lifecycle.ts";
+import { LocalDashboard, isDashboardRequest } from "./local-dashboard.ts";
 import {
   deriveResponsesRequestStructure,
   ExactItemRecurrenceTracker,
@@ -239,7 +240,12 @@ export function createInlayServer(config: ProxyConfig, metrics = new MetricsStor
   const recurrenceTracker = config.recurrenceProbe === "exact-item"
     ? new ExactItemRecurrenceTracker(config.semanticInspection === "role-categories")
     : undefined;
+  const dashboard = new LocalDashboard(config, metrics, exchangeLifecycle, recurrenceTracker);
   async function handleRequest(request: IncomingMessage, response: ServerResponse): Promise<void> {
+    if (isDashboardRequest(request)) {
+      await dashboard.handle(request, response);
+      return;
+    }
     if (request.method === "GET" && request.url === "/health") {
       sendJson(response, 200, { status: "ok", upstreamConfigured: Boolean(config.upstreamBaseUrl), mode: "transparent" });
       return;
@@ -267,7 +273,7 @@ export function createInlayServer(config: ProxyConfig, metrics = new MetricsStor
     sendJson(response, 404, { error: { code: "inlay_route_not_found", message: "Supported routes: GET /health, GET /metrics, POST /v1/chat/completions, POST /v1/responses, POST /v1/codex/responses." } });
   }
 
-  return createServer((request, response) => {
+  const server = createServer((request, response) => {
     const admitted = isSupportedExchange(request);
     if (admitted) exchangeLifecycle.admit();
     const originalCallbackPromise = handleRequest(request, response);
@@ -280,4 +286,6 @@ export function createInlayServer(config: ProxyConfig, metrics = new MetricsStor
       },
     );
   });
+  dashboard.attach(server);
+  return server;
 }

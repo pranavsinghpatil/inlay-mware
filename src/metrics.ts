@@ -41,6 +41,13 @@ export class MetricsStore {
   #totalRequests = 0;
   #totalRequestBytes = 0;
   #nextObservationSequence = 0;
+  #recordListeners = new Set<(metric: RequestMetric) => void>();
+
+  /** Observe existing outcome records; does not add measurements or change snapshots. */
+  subscribeRecords(listener: (metric: RequestMetric) => void): () => void {
+    this.#recordListeners.add(listener);
+    return () => { this.#recordListeners.delete(listener); };
+  }
 
   nextObservationSequence(): number {
     this.#nextObservationSequence += 1;
@@ -52,6 +59,10 @@ export class MetricsStore {
     this.#totalRequestBytes += metric.requestBytes;
     this.#recent.unshift(metric);
     this.#recent.length = Math.min(this.#recent.length, 100);
+    for (const listener of this.#recordListeners) {
+      // Presentation/persistence failure must never change proxy outcome handling.
+      try { listener(metric); } catch { /* The subscriber owns its availability. */ }
+    }
   }
 
   snapshot(): object {

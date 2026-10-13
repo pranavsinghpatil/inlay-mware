@@ -129,3 +129,13 @@ not arbitrary SSE compatibility, response completeness, provider correctness,
 task success, performance or savings. Bare-CR framing remains unsupported.
 Forwarded bytes, configuration, observation fields and event interpretation are
 unchanged.
+
+## Local presentation and aggregate history (unreleased M2)
+
+The [local observation surface](local-observation.md) presents these existing
+measurements without changing `/metrics`. Its separate endpoint provides derived
+server-instance rollups and up to 20 allowlisted recent rows. Optional disk history
+contains aggregate session checkpoints only, with field-level coverage and fixed
+availability/incomplete flags. No request rows or workload content are persisted.
+Session boundaries do not identify tasks or harness sessions. Existing measurement
+interpretation limits apply to the UI and persisted aggregates equally.

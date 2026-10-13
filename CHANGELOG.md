@@ -1,5 +1,18 @@
 # Changelog
 
+## Unreleased — Local observation surface (M2)
+
+- Add a self-hosted loopback dashboard at `/` and `/dashboard`, with sequential
+  local polling and a separate approved-data presentation endpoint.
+- Present existing lifecycle, usage/coverage, integrity, structural, recurrence
+  and recent outcome facts without changing `/metrics` or provider payloads.
+- Add opt-in aggregate-only local session history: five-second checkpoints,
+  normal-close flush, bounded retention and explicit unknown-end/storage states.
+- Keep recent request rows, identifiers, raw workload content, configuration URLs
+  and filesystem paths out of history. No telemetry or optimization is added.
+
+No M2 version or publication is declared. Daily-use usefulness is unmeasured.
+
 ## Unreleased — proposed v0.1.1
 
 - Add process-local lifecycle counters to `GET /metrics`: admitted, active,

@@ -8,6 +8,8 @@ export interface ProxyConfig {
   recurrenceProbe?: "off" | "exact-item";
   semanticInspection?: "off" | "role-categories";
   timelineMode?: "off" | "content-free";
+  historyDirectory?: string;
+  historyMaxSessions?: number;
 }
 
 function positiveInteger(value: string | undefined, fallback: number, name: string): number {
@@ -80,6 +82,11 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): ProxyConfig {
     throw new Error("INLAY_TIMELINE requires INLAY_OBSERVATION=structural.");
   }
 
+  const historyMaxSessions = positiveInteger(env.INLAY_HISTORY_MAX_SESSIONS, 20, "INLAY_HISTORY_MAX_SESSIONS");
+  if (!/^(?:[1-9][0-9]*)$/.test(env.INLAY_HISTORY_MAX_SESSIONS || "20") || historyMaxSessions > 100) {
+    throw new Error("INLAY_HISTORY_MAX_SESSIONS must be an integer from 1 to 100.");
+  }
+
   return {
     host,
     port: positiveInteger(env.INLAY_PORT, 8787, "INLAY_PORT"),
@@ -90,6 +97,8 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): ProxyConfig {
     recurrenceProbe: configuredRecurrenceProbe,
     semanticInspection: configuredSemanticInspection,
     timelineMode: configuredTimelineMode,
+    historyDirectory: env.INLAY_HISTORY_DIR || undefined,
+    historyMaxSessions,
   };
 }
 
