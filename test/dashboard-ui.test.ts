@@ -12,7 +12,14 @@ class Element {
   textContent = "";
   hidden = false;
   colSpan = 1;
+  open = false;
   append(...elements: Element[]) { this.children.push(...elements); }
+  insertBefore(element: Element, reference: Element | null) {
+    const old = this.children.indexOf(element);
+    if (old >= 0) this.children.splice(old, 1);
+    const index = reference ? this.children.indexOf(reference) : this.children.length;
+    this.children.splice(index, 0, element);
+  }
   removeChild(child: Element) { this.children.splice(this.children.indexOf(child), 1); }
   get firstChild() { return this.children[0] ?? null; }
 }
@@ -137,4 +144,53 @@ test("historical usage keeps coverage and incomplete flags separate from success
   assert.match(history, /2 yes · 0 no · 0 unavailable/);
   assert.match(history, /12 sessions/);
   assert.doesNotMatch(history, /known positive transport flags/);
+});
+
+
+test("empty outcome context distinguishes no records from admitted handler activity", async () => {
+  const data = payload();
+  data.current.totals.outcomes = 0;
+  data.current.lifecycle.admitted = 0;
+  const empty = harness(async () => ({ ok: true, json: async () => data }));
+  await new Promise(resolve => setImmediate(resolve));
+  assert.equal(empty.elements.get("activity-title")!.textContent, "No recorded outcomes");
+  assert.match(empty.elements.get("activity-description")!.textContent, /Only traffic routed through Inlay/);
+  assert.match(empty.elements.get("usage-note")!.textContent, /no recorded outcomes to sum/);
+  data.current.lifecycle.admitted = 1;
+  const admitted = harness(async () => ({ ok: true, json: async () => data }));
+  await new Promise(resolve => setImmediate(resolve));
+  assert.match(admitted.elements.get("activity-description")!.textContent, /Handler activity exists/);
+  assert.doesNotMatch(admitted.elements.get("activity-description")!.textContent, /no traffic/i);
+});
+
+test("missing lifecycle evidence does not assert complete accounting", async () => {
+  const data = payload();
+  const partial = data.current.lifecycle as Partial<typeof data.current.lifecycle>;
+  delete partial.incomplete;
+  partial.availability = "UNAVAILABLE";
+  const h = harness(async () => ({ ok: true, json: async () => data }));
+  await new Promise(resolve => setImmediate(resolve));
+  assert.match(h.flatten(h.elements.get("lifecycle")!), /Accounting incomplete: unavailable/);
+  assert.doesNotMatch(h.flatten(h.elements.get("lifecycle")!), /Accounting incomplete: no/);
+});
+
+test("polling keeps history disclosure nodes and open state while checkpoints update", async () => {
+  const data = payload();
+  data.history = { status: "ready", reason: null, retentionSessions: 20, sessions: [data.current] };
+  const h = harness(async () => ({ ok: true, json: async () => data }));
+  await new Promise(resolve => setImmediate(resolve));
+  const history = h.elements.get("history")!;
+  const disclosure = history.children[1];
+  disclosure.open = true;
+  const summary = disclosure.children[0];
+  const recentRow = h.elements.get("recent")!.children[0];
+  data.current.updatedAt = "2026-01-01T00:02:00.000Z";
+  data.current.totals.outcomes = 3;
+  h.timers.find(timer => timer.delay === 2000)!.callback();
+  await new Promise(resolve => setImmediate(resolve));
+  assert.equal(history.children[1], disclosure);
+  assert.equal(disclosure.children[0], summary);
+  assert.equal(disclosure.open, true);
+  assert.match(h.flatten(disclosure), /3 outcomes/);
+  assert.equal(h.elements.get("recent")!.children[0], recentRow);
 });

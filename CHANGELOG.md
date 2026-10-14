@@ -6,6 +6,8 @@
   local polling and a separate approved-data presentation endpoint.
 - Present existing lifecycle, usage/coverage, integrity, structural, recurrence
   and recent outcome facts without changing `/metrics` or provider payloads.
+- Organize the dark dashboard by runtime state, usage coverage, recent activity
+  and saved sessions, with contextual definitions and responsive outcome rows.
 - Add opt-in aggregate-only local session history: five-second checkpoints,
   normal-close flush, bounded retention and explicit unknown-end/storage states.
 - Keep recent request rows, identifiers, raw workload content, configuration URLs

@@ -1,15 +1,209 @@
 export const DASHBOARD_HTML = `<!doctype html>
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="color-scheme" content="dark"><title>Inlay · Local observation</title><link rel="stylesheet" href="/dashboard/style.css"></head>
-<body><header class="top"><a href="/" class="brand">Inlay</a><span class="subtitle">Local observation</span><span id="connection" class="connection" role="status" aria-live="polite">Connecting…</span></header>
-<main><section class="intro"><div><p class="eyebrow">OBSERVATION DASHBOARD</p><h1>Local observation</h1><p class="muted">Content-free measurements from this server instance.</p></div><p id="updated" class="updated" aria-live="polite">Waiting for first update</p></section>
+<body>
+<a class="skip-link" href="#main">Skip to observations</a>
+<header class="top"><a href="/" class="brand" aria-label="Inlay home"><svg width="22" height="22" viewBox="0 0 22 22" aria-hidden="true"><path fill="currentColor" d="M2 2h8v8H2zm10 0h8v8h-8zM2 12h8v8H2z"/><path fill="currentColor" opacity=".4" d="M12 12h8v8h-8z"/></svg>Inlay</a><span class="subtitle">Local observation</span><div class="connection-wrap"><span class="connection-label">Dashboard</span><span id="connection" class="connection" role="status" aria-live="polite">Connecting…</span></div></header>
+<div class="workspace">
+<aside class="sidebar"><nav aria-label="Observation sections"><a href="#overview">Overview</a><a href="#reported-usage">Reported usage</a><a href="#recent-activity">Recent activity</a><a href="#saved-sessions">Saved sessions</a><a href="#scope">Scope &amp; setup</a></nav><p class="sidebar-note">On this machine.<br>Aggregate evidence only.</p></aside>
+<main id="main">
+<section id="overview" class="overview"><div class="page-heading"><h1>Local observation</h1><p id="updated" class="updated">Waiting for first update</p></div><p class="intro">Activity routed through this Inlay instance.</p>
 <div id="notice" class="notice" role="status" aria-live="polite" hidden></div>
-<section class="card"><div class="section-head"><div><h2>Current session</h2><p class="muted">Recorded outcomes during this server instance</p></div><span id="session-state" class="badge">Unavailable</span></div><div id="lifecycle" class="metrics grid" aria-label="Exchange lifecycle"></div><h3>Reported usage and coverage</h3><div id="usage" class="metrics grid"></div><p class="footnote">Provider-reported usage; these values do not represent billing or task success. Counts describe recorded outcomes, not logical requests.</p></section>
-<section class="columns"><article class="card"><h2>Integrity and structure</h2><div id="integrity" class="metrics"></div></article><article class="card"><h2>Recurrence</h2><div id="recurrence" class="metrics"></div></article></section>
-<section class="card"><div class="section-head"><div><h2>Recent outcomes</h2><p class="muted">Latest approved summary fields</p></div></div><div class="table-wrap"><table><thead><tr><th>Route</th><th>Duration</th><th>Request bytes</th><th>Response bytes</th><th>Input tokens</th><th>Output tokens</th><th>Structure</th><th>Previously seen</th><th>Transport</th></tr></thead><tbody id="recent"><tr><td colspan="9" class="muted">Waiting for data</td></tr></tbody></table></div></section>
-<section class="card"><div class="section-head"><div><h2>Historical sessions</h2><p class="muted">Aggregate summaries only</p></div></div><div id="history" class="table-wrap muted">History unavailable</div></section></main><footer>Inlay · Local dashboard</footer><script src="/dashboard/app.js" defer></script></body></html>`;
+<div class="activity-summary"><div><h2 id="activity-title">Waiting for observations</h2><p id="activity-description">Connecting to the local dashboard. Measurement values have not loaded.</p></div><span id="session-state" class="session-state">Unavailable</span></div>
+<div id="lifecycle" class="lifecycle" aria-label="Exchange lifecycle"></div>
+<details class="definition"><summary>How to read these counts</summary><p>Admitted counts handler entries. Active counts handlers still open. Forwarding counts local calls to the upstream request function. Finalized counts normally closed handlers. They do not establish provider receipt or task success.</p><p>A session is this server instance's lifetime. Several clients using it contribute to combined totals; there is no per-agent attribution.</p></details>
+</section>
+<section id="reported-usage" class="section"><div class="section-heading"><h2>Reported usage</h2><span class="section-note">Current session</span></div><p id="usage-note" class="support-copy">Usage appears when a recorded outcome includes provider-reported values.</p><div id="usage" class="usage"></div><div id="volume" class="volume"></div><details class="definition"><summary>What coverage means</summary><p>Available counts outcomes that include a value for that field; missing counts those that do not. Zero is a reported value. Unavailable is not zero. Each total sums encountered values across recorded outcomes, not verified final accounting, a bill or a task total.</p></details></section>
+<section class="observation-details" aria-label="Measurement detail">
+<details class="measurement"><summary><span><strong>Integrity &amp; structure</strong><span id="integrity-brief" class="disclosure-note">Observation coverage and response flags</span></span><span class="disclosure-action" aria-hidden="true">Details</span></summary><div class="disclosure-body"><p class="support-copy">Yes / no / unavailable describes each recorded flag. No known incompleteness does not prove exhaustive observation. Canonical bytes measure structure, not tokens.</p><div id="integrity" class="detail-metrics"></div></div></details>
+<details class="measurement"><summary><span><strong>Exact recurrence</strong><span id="recurrence-brief" class="disclosure-note">Previously seen canonical items</span></span><span class="disclosure-action" aria-hidden="true">Details</span></summary><div class="disclosure-body"><p class="support-copy">Matches are exact canonical items seen within this process. They do not establish redundant work, removable context or potential savings.</p><div id="recurrence" class="detail-metrics"></div></div></details>
+</section>
+<section id="recent-activity" class="section"><div class="section-heading"><h2>Recent activity</h2><span class="section-note">Latest 20 outcomes</span></div><p class="support-copy">Approved outcome summaries. No prompts, source or tool output.</p><div class="table-wrap"><table class="recent-table"><caption class="visually-hidden">Recent recorded outcome measurements</caption><thead><tr><th scope="col">Route</th><th scope="col">Duration</th><th scope="col">Request bytes</th><th scope="col">Response bytes</th><th scope="col">Input tokens</th><th scope="col">Output tokens</th><th scope="col">Structure</th><th scope="col">Previously seen</th><th scope="col">Transport</th></tr></thead><tbody id="recent"><tr class="empty-row"><td colspan="9">Waiting for data</td></tr></tbody></table></div></section>
+<section id="saved-sessions" class="section"><div class="section-heading"><h2>Saved sessions</h2><span class="section-note">Local aggregates</span></div><p class="support-copy">Bounded checkpoints of server lifetimes. Recent outcome rows are not saved.</p><div id="history" class="history">History status has not loaded.</div></section>
+<details id="scope" class="scope"><summary>Scope &amp; setup<span aria-hidden="true">Read guide</span></summary><div class="scope-body"><div><h3>Connect a compatible client</h3><ol><li>Configure Inlay's upstream URL for your existing provider.</li><li>Point the client's supported HTTP base URL at this Inlay instance's <code>/v1</code> endpoint. The client keeps responsibility for authentication.</li><li>Use the client normally, then look for admitted exchanges and recorded outcomes here.</li></ol><p>Starting Inlay does not capture other open apps. WebSocket traffic and general coding-agent compatibility are unsupported.</p></div><div><h3>Keep aggregate history</h3><p>Set <code>INLAY_HISTORY_DIR</code> to a private local directory before starting the server. Retention defaults to 20 sessions; <code>INLAY_HISTORY_MAX_SESSIONS</code> accepts 1–100.</p><p>Only aggregate summaries are written, every five seconds and on normal close. Abrupt stops can lose recent updates or leave a lock requiring manual recovery.</p><h3>Know the boundary</h3><p>This view cannot establish task success, retries, provider receipt, cost savings or whole-run capture. Missing evidence remains unavailable.</p></div></div></details>
+<footer><span>Inlay</span><span>Local measurements · No workload content retained</span></footer>
+</main></div><script src="/dashboard/app.js" defer></script></body></html>`;
 
-export const DASHBOARD_CSS = `:root{color-scheme:dark;font-family:Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;color:#e5eaf0;background:#10151c;font-synthesis:none;text-rendering:optimizeLegibility}*{box-sizing:border-box}body{margin:0}.top{height:64px;background:#18212b;border-bottom:1px solid #344252;display:flex;align-items:center;padding:0 max(24px,calc((100% - 1120px)/2));gap:14px}.brand{font-weight:750;font-size:18px;color:#9edbca;text-decoration:none}.subtitle{color:#a8b4c2;font-size:14px}.connection{margin-left:auto;font-size:13px;color:#86d9ad}.connection.offline{color:#ffaaa0}.connection.stale{color:#efd08b}main{max-width:1120px;margin:40px auto;padding:0 24px}.intro,.section-head{display:flex;justify-content:space-between;align-items:flex-start;gap:20px}.intro{margin-bottom:24px}.eyebrow{font-size:11px;letter-spacing:.13em;color:#9bc7bb;font-weight:700;margin:0 0 8px}h1{font-size:30px;letter-spacing:-.035em;margin:0 0 7px}h2{font-size:18px;margin:0 0 6px}h3{font-size:14px;margin:26px 0 10px}.muted,.updated{font-size:13px;color:#a8b4c2;margin:0}.updated{text-align:right;padding-top:5px}.card{background:#18212b;border:1px solid #344252;border-radius:10px;padding:22px;margin-bottom:18px;box-shadow:0 2px 8px #172b3608}.badge{background:#233d35;color:#a3e4c1;border-radius:999px;padding:5px 10px;font-size:12px;white-space:nowrap}.grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}.metric{padding:13px;border:1px solid #344252;border-radius:7px;min-width:0}.metric .label{font-size:12px;color:#b0bdcb;display:block;margin-bottom:7px}.metric .value{font-size:18px;font-weight:650;overflow-wrap:anywhere}.metric .detail{font-size:11px;color:#a8b4c2;margin-top:4px}.footnote{font-size:12px;color:#a8b4c2;margin:16px 0 0;line-height:1.5}.columns{display:grid;grid-template-columns:1fr 1fr;gap:18px}.columns .card{min-width:0}.metrics:not(.grid) .metric{margin-top:9px}.notice{border:1px solid #75603c;background:#30291c;color:#f1d596;padding:12px 15px;border-radius:7px;margin-bottom:18px;font-size:13px}.notice[hidden]{display:none}.table-wrap{overflow:auto}table{border-collapse:collapse;width:100%;font-size:12px;white-space:nowrap}th{text-align:left;color:#b0bdcb;font-weight:600;border-bottom:1px solid #344252;padding:10px 12px}td{border-bottom:1px solid #2c3948;padding:11px 12px}tbody tr:last-child td{border-bottom:0}.route{font-family:ui-monospace,monospace;font-size:11px}footer{max-width:1120px;margin:12px auto 30px;padding:0 24px;color:#a8b4c2;font-size:12px}@media(max-width:760px){main{margin:25px auto;padding:0 14px}.top{padding:0 14px}.grid{grid-template-columns:repeat(2,minmax(0,1fr))}.columns{grid-template-columns:1fr}.intro{display:block}.updated{text-align:left;margin-top:12px}.card{padding:16px}.section-head{gap:8px}footer{padding:0 14px}}`;
-
+export const DASHBOARD_CSS = `
+:root{color-scheme:dark;--ground:#131513;--surface:#1b1e1b;--raised:#222622;--ink:#e8ebe5;--muted:#a8b0a5;--accent:#b5cbaa;--line:#353b34;--warning:#edd3a7;--warning-bg:#302b22;--danger:#e9b3ac;font-family:"Segoe UI","Helvetica Neue",Arial,sans-serif;font-size:14px;line-height:1.55;color:var(--ink);background:var(--ground);font-synthesis:none;text-rendering:optimizeLegibility}
+*{box-sizing:border-box}
+body{margin:0}
+a{color:inherit;text-decoration:none}
+a:hover{color:var(--accent)}
+a:focus-visible,summary:focus-visible{outline:2px solid var(--accent);outline-offset:5px;border-radius:3px}
+a,summary{-webkit-tap-highlight-color:transparent}
+p{margin:0 0 12px}
+h1,h2,h3{font-weight:500;line-height:1.25;margin:0}
+h1{font-size:36px;letter-spacing:-.035em}
+h2{font-size:20px;letter-spacing:-.02em}
+h3{font-size:15px;margin-bottom:12px}
+code{font-family:ui-monospace,Consolas,monospace;font-size:.92em;overflow-wrap:anywhere;color:var(--ink)}
+[hidden]{display:none!important}
+.visually-hidden,.skip-link:not(:focus){position:absolute;width:1px;height:1px;padding:0;overflow:hidden;clip-path:inset(50%);white-space:nowrap}
+.skip-link:focus{position:fixed;top:12px;left:12px;z-index:5;background:var(--ink);color:var(--ground);padding:12px 18px}
+.top{height:72px;display:flex;align-items:center;gap:28px;padding:0 36px;background:var(--surface)}
+.brand{display:flex;align-items:center;gap:12px;font-size:20px;font-weight:600;letter-spacing:-.025em}
+.brand svg{color:var(--accent)}
+.subtitle{color:var(--muted);font-size:14px}
+.connection-wrap{margin-left:auto;display:flex;gap:12px;align-items:center}
+.connection-label{font-size:13px;color:var(--muted)}
+.connection{font-size:13px;display:flex;gap:7px;align-items:center}
+.connection:before{content:"";width:6px;height:6px;border-radius:50%;background:var(--accent)}
+.connection.offline{color:var(--danger)}
+.connection.offline:before{background:var(--danger)}
+.workspace{display:grid;grid-template-columns:190px minmax(0,1fr);max-width:1480px;margin:auto}
+.sidebar{padding:46px 18px 30px 28px;align-self:start;position:sticky;top:0}
+.sidebar nav{display:flex;flex-direction:column;gap:4px}
+.sidebar nav a{padding:10px 12px;border-radius:4px;color:var(--muted)}
+.sidebar nav a:hover,.sidebar nav a:focus-visible{color:var(--ink);background:var(--surface)}
+.sidebar-note{font-size:12px;line-height:1.7;color:var(--muted);margin:48px 12px 0}
+main{min-width:0;padding:46px 42px 28px;max-width:1240px}
+section,details[id]{scroll-margin-top:24px}
+.page-heading{display:flex;justify-content:space-between;align-items:baseline;gap:20px}
+.updated{color:var(--muted);font-size:12px;margin:0;white-space:nowrap}
+.intro{color:var(--muted);margin:10px 0 28px;font-size:15px}
+.activity-summary{background:var(--surface);padding:22px 24px;display:flex;justify-content:space-between;gap:24px;align-items:flex-start;border-radius:6px}
+.activity-summary h2{font-size:21px;margin-bottom:6px}
+.activity-summary p{color:var(--muted);max-width:65ch;margin:0}
+.session-state{font-size:12px;color:var(--accent);padding-top:4px;white-space:nowrap}
+.notice{background:var(--warning-bg);color:var(--warning);padding:16px 20px;border-radius:4px;margin-bottom:20px}
+.lifecycle{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));column-gap:24px;row-gap:22px;padding:26px 0 0}
+.metric{min-width:0}
+.metric .label{font-size:13px;color:var(--muted)}
+.metric .value{font-size:32px;letter-spacing:-.025em;line-height:1.35;font-variant-numeric:tabular-nums;overflow-wrap:anywhere}
+.metric .detail{font-size:12px;color:var(--muted);margin-top:5px}
+.runtime-meta{grid-column:1/-1;display:flex;flex-wrap:wrap;gap:14px 36px;color:var(--muted);font-size:12px;background:var(--surface);border-radius:4px;padding:12px 16px}
+.runtime-meta .metric{display:flex;gap:8px;align-items:baseline;flex-wrap:wrap}
+.runtime-meta .label,.runtime-meta .value,.runtime-meta .detail{font-size:12px;line-height:1.55;margin:0;letter-spacing:0}
+.runtime-meta .value{color:var(--ink)}
+.definition{margin-top:16px;color:var(--muted);max-width:80ch;font-size:13px}
+.definition summary{cursor:pointer;padding:5px 0;width:fit-content}
+.definition p{margin:12px 0}
+.section{margin-top:42px}
+.section-heading{display:flex;align-items:baseline;justify-content:space-between;gap:16px;margin-bottom:10px}
+.section-note{color:var(--muted);font-size:12px;text-align:right}
+.support-copy{color:var(--muted);font-size:14px;max-width:80ch}
+.usage{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:24px;padding:20px 0 12px}
+.usage .value{font-size:28px}
+.metric .value.unavailable{font-size:18px;line-height:2.1;letter-spacing:0;color:var(--muted)}
+.volume{display:flex;flex-wrap:wrap;gap:16px 34px;margin-top:12px;background:var(--surface);padding:14px 18px;border-radius:4px}
+.volume .metric{display:grid;grid-template-columns:auto auto;gap:0 10px;align-items:baseline}
+.volume .value{font-size:14px;letter-spacing:0}
+.volume .detail{grid-column:1/-1}
+.observation-details{margin-top:30px;background:var(--surface);border-radius:6px;padding:0 24px}
+.measurement+.measurement{border-top:1px solid var(--line)}
+.measurement>summary{display:flex;justify-content:space-between;align-items:center;gap:20px;cursor:pointer;padding:20px 0;list-style:none}
+.measurement>summary::-webkit-details-marker,.scope>summary::-webkit-details-marker{display:none}
+summary strong{font-size:15px;font-weight:500}
+.disclosure-note{display:block;color:var(--muted);font-size:13px;margin-top:3px}
+.disclosure-action{font-size:12px;color:var(--muted);display:flex;gap:12px;align-items:center}
+.disclosure-action:after,.scope>summary>span:after{content:"+";font-size:20px;font-weight:400}
+.measurement[open] .disclosure-action:after,.scope[open]>summary>span:after{content:"−"}
+.disclosure-body{padding:0 0 22px}
+.detail-metrics{display:grid;grid-template-columns:1fr 1fr;gap:18px 36px;padding-top:10px}
+.detail-metrics .metric .value{font-size:15px;line-height:1.6;letter-spacing:0}
+.detail-metrics .metric .detail{margin-top:2px}
+.table-wrap{max-width:100%;overflow:auto;margin-top:20px}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th{text-align:left;color:var(--muted);font-weight:400;font-size:12px;padding:12px 10px;background:var(--surface)}
+td{padding:18px 10px;border-bottom:1px solid var(--line);vertical-align:top;font-variant-numeric:tabular-nums;overflow-wrap:anywhere}
+th:first-child,td:first-child{padding-left:16px}
+.recent-table td{min-width:66px}
+.recent-table td:first-child{min-width:120px}
+.recent-table td:last-child{min-width:130px;max-width:200px}
+.recent-table td:nth-child(7){min-width:110px}
+.recent-table td details>summary{cursor:pointer;white-space:nowrap;color:var(--muted)}
+.recent-table td details p{color:var(--muted);font-size:12px;margin:8px 0 0;min-width:140px;white-space:normal}
+.cell-label{display:none}
+.empty-row td{padding:30px 20px;background:var(--surface);border:0;white-space:normal;color:var(--muted)}
+.empty-row .empty-title{color:var(--ink);font-size:15px;margin-bottom:6px}
+.empty-row a,.scope-body a{color:var(--accent);text-decoration:underline;text-underline-offset:4px}
+.history{margin-top:20px}
+.history .detail{color:var(--muted);font-size:12px;margin-bottom:14px}
+.history-empty{padding:22px 24px;background:var(--surface);border-radius:6px}
+.history-empty .empty-title{font-size:15px;color:var(--ink);margin-bottom:6px}
+.history-empty p{color:var(--muted);max-width:72ch;margin-bottom:10px}
+.history-empty .detail{margin:0}
+.saved-session{background:var(--surface);padding:0 22px;border-radius:4px;margin-bottom:8px}
+.saved-session>summary{cursor:pointer;padding:18px 0;display:flex;justify-content:space-between;gap:20px;list-style:none}
+.saved-session>summary::-webkit-details-marker{display:none}
+.saved-session .session-date{font-size:14px}
+.saved-session .session-description{color:var(--muted);font-size:12px;display:block;margin-top:4px}
+.saved-session .session-totals{color:var(--muted);font-size:13px;text-align:right}
+.saved-session[open]>summary{padding-bottom:8px}
+.saved-session .detail-metrics{padding-bottom:22px}
+.scope{margin-top:42px;background:var(--surface);padding:0 24px;border-radius:6px}
+.scope>summary{padding:20px 0;display:flex;justify-content:space-between;gap:16px;cursor:pointer;list-style:none;font-size:15px}
+.scope>summary>span{color:var(--muted);font-size:12px;display:flex;align-items:center;gap:12px}
+.scope-body{display:grid;grid-template-columns:1fr 1fr;gap:36px;padding:8px 0 26px;color:var(--muted);font-size:14px}
+.scope-body h3{color:var(--ink)}
+.scope-body ol{padding-left:20px;margin:0 0 16px}
+.scope-body li{padding-left:4px;margin-bottom:12px}
+.scope-body h3:not(:first-child){margin-top:22px}
+footer{display:flex;justify-content:space-between;gap:24px;margin-top:42px;font-size:12px;color:var(--muted)}
+footer span:first-child{color:var(--ink)}
+@media(max-width:1050px){.workspace{grid-template-columns:165px minmax(0,1fr)}
+.sidebar{padding-left:16px}
+main{padding-left:26px;padding-right:26px}
+.page-heading{display:block}
+.updated{margin-top:10px}
+.usage,.lifecycle{column-gap:16px}
+.usage .value{font-size:24px}
+}
+@media(max-width:1050px){
+.recent-table thead{display:none}
+.recent-table,.recent-table tbody{display:block;width:100%}
+.recent-table tr{display:grid;grid-template-columns:1fr 1fr;gap:8px 24px;padding:18px;background:var(--surface);border-radius:4px;margin-bottom:10px}
+.recent-table td,.recent-table td:first-child,.recent-table td:last-child,.recent-table td:nth-child(7){min-width:0;max-width:none;padding:5px 0;border:0;display:grid;grid-template-columns:112px minmax(0,1fr);gap:10px}
+.cell-label{display:block;color:var(--muted);font-size:12px}
+.recent-table td details p{min-width:0}
+.recent-table .empty-row{display:block}
+.recent-table .empty-row td{display:block;padding:8px 0}
+}
+@media(max-width:760px){.top{height:64px;padding:0 20px;gap:20px}
+.subtitle{display:none}
+.connection-label{display:none}
+.workspace{display:block}
+.sidebar{position:static;padding:14px 16px 0}
+.sidebar nav{flex-direction:row;flex-wrap:wrap;gap:2px}
+.sidebar nav a{padding:8px 10px;font-size:12px}
+.sidebar-note{display:none}
+main{padding:26px 20px}
+.page-heading h1{font-size:30px}
+.intro{margin-bottom:22px}
+.activity-summary{padding:20px;gap:14px}
+.activity-summary h2{font-size:19px}
+.activity-summary p{font-size:13px}
+.lifecycle,.usage{grid-template-columns:repeat(2,minmax(0,1fr));gap:22px 24px}
+.runtime-meta{gap:10px}
+.runtime-meta .metric{display:block}
+.runtime-meta .label{display:inline;margin-right:8px}
+.runtime-meta .value{display:inline}
+.runtime-meta .detail{display:block}
+.volume{gap:14px 24px}
+.section{margin-top:34px}
+.section-heading h2{font-size:19px}
+.observation-details{padding:0 20px}
+.detail-metrics,.scope-body{grid-template-columns:1fr;gap:18px}
+.scope{padding:0 20px}
+.scope-body{gap:24px}
+.recent-table thead{display:none}
+.recent-table,.recent-table tbody,.recent-table tr,.recent-table td{display:block;width:100%}
+.recent-table tr{padding:16px;background:var(--surface);border-radius:4px;margin-bottom:10px}
+.recent-table td,.recent-table td:first-child,.recent-table td:last-child,.recent-table td:nth-child(7){min-width:0;max-width:none;padding:5px 0;border:0;display:grid;grid-template-columns:112px minmax(0,1fr);gap:10px}
+.cell-label{display:block;color:var(--muted);font-size:12px}
+.recent-table td details p{min-width:0}
+.recent-table .empty-row td{display:block;padding:8px 0}
+.saved-session{padding:0 18px}
+.saved-session>summary{display:block}
+.saved-session .session-totals{text-align:left;display:block;margin-top:10px}
+footer{display:block}
+footer span{display:block;margin-bottom:6px}
+}
+@media(prefers-reduced-motion:no-preference){a,summary{transition:color 140ms ease,background-color 140ms ease}
+}
+@media(prefers-reduced-motion:reduce){*,*:before,*:after{animation:none!important;transition:none!important;scroll-behavior:auto!important}
+}
+`;
 export const DASHBOARD_JS = `(() => {
   'use strict';
 
@@ -29,7 +223,7 @@ export const DASHBOARD_JS = `(() => {
     const element = document.createElement('div');
     element.className = 'metric';
     addText(element, label, 'label');
-    addText(element, value, 'value');
+    addText(element, value, value === 'Unavailable' ? 'value unavailable' : 'value');
     if (detail) addText(element, detail, 'detail');
     parent.append(element);
   }
@@ -60,34 +254,55 @@ export const DASHBOARD_JS = `(() => {
     return Number.isFinite(date.getTime()) ? date.toLocaleString() : 'Unavailable';
   }
 
+  function renderContext(session, totals, modes) {
+    const count = totals.outcomes;
+    const admitted = session.lifecycle.admitted;
+    $('activity-title').textContent = count === 0 ? 'No recorded outcomes' : format(count) + ' recorded outcomes';
+    $('activity-description').textContent = count === 0
+      ? admitted > 0 ? 'Handler activity exists, but no outcome summaries have been recorded. Admission and outcome coverage describe different populations.'
+        : 'No outcomes have been recorded in this instance. Only traffic routed through Inlay can appear here.'
+      : 'These summaries cover this server lifetime. They do not identify a coding agent, conversation or task.';
+    $('usage-note').textContent = count === 0 ? 'No reported usage yet. There are no recorded outcomes to sum.'
+      : modes.observation === 'off' ? 'Observation is off. Provider usage observation is disabled; missing fields remain unavailable.'
+      : 'Each field has its own coverage. Missing provider values remain unavailable, not zero.';
+    $('integrity-brief').textContent = format(totals.structure?.available) + (totals.structure?.available === 1 ? ' outcome' : ' outcomes') + ' with structure · ' + format(totals.structure?.unavailable) + ' unavailable';
+    $('recurrence-brief').textContent = modes.recurrence === 'off' ? 'Tracking is off'
+      : format(totals.recurrence?.available) + (totals.recurrence?.available === 1 ? ' outcome' : ' outcomes') + ' with recurrence · ' + format(totals.recurrence?.unavailable) + ' unavailable';
+  }
+
   function renderLifecycle(session, modes) {
     const lifecycle = session.lifecycle;
     const parent = clear('lifecycle');
-    for (const [label, key] of [['Admitted', 'admitted'], ['Active', 'active'], ['Forwarding', 'forwarding'], ['Finalized', 'finalized']]) {
-      addMetric(parent, label, format(lifecycle[key]));
-    }
-    addMetric(parent, 'Session started', dateLabel(session.startedAt));
-    addMetric(parent, 'Observation mode', modes.observation || 'Unavailable', modes.observation === 'off' ? 'Structure and provider usage observation are disabled' : 'Approved structural summaries enabled');
-    addMetric(parent, 'Lifecycle status', lifecycle.availability === 'AVAILABLE' ? 'Available' : 'Unavailable', lifecycle.incomplete ? 'Accounting incomplete: yes' : 'Accounting incomplete: no');
-    if (lifecycle.unavailableReason) addMetric(parent, 'Unavailable reason', lifecycle.unavailableReason);
+    for (const [label, key, detail] of [
+      ['Admitted', 'admitted', 'Handler entries'], ['Active', 'active', 'Handlers still open'],
+      ['Forwarding', 'forwarding', 'Local upstream invocations'], ['Finalized', 'finalized', 'Normally closed handlers']
+    ]) addMetric(parent, label, format(lifecycle[key]), detail);
+    const meta = document.createElement('div');
+    meta.className = 'runtime-meta';
+    addMetric(meta, 'Session started', dateLabel(session.startedAt));
+    addMetric(meta, 'Observation mode', modes.observation || 'Unavailable');
+    addMetric(meta, 'Lifecycle status', lifecycle.availability === 'AVAILABLE' ? 'Available' : 'Unavailable', lifecycle.incomplete === true ? 'Accounting incomplete: yes' : lifecycle.availability === 'AVAILABLE' && lifecycle.incomplete === false ? 'Accounting incomplete: no' : 'Accounting incomplete: unavailable');
+    if (lifecycle.unavailableReason) addMetric(meta, 'Unavailable reason', lifecycle.unavailableReason);
+    parent.append(meta);
   }
 
   function renderUsage(totals) {
     const parent = clear('usage');
-    addMetric(parent, 'Recorded outcomes', format(totals.outcomes));
-    addCoverage(parent, 'Request bytes', totals.requestBytes);
-    addCoverage(parent, 'Response bytes', totals.responseBytes);
-    for (const [key, label] of [['inputTokens', 'Input tokens'], ['outputTokens', 'Output tokens'], ['totalTokens', 'Total tokens'], ['cachedInputTokens', 'Cached input tokens']]) {
+    for (const [key, label] of [['inputTokens', 'Input tokens'], ['outputTokens', 'Output tokens'], ['cachedInputTokens', 'Cached input tokens'], ['totalTokens', 'Total tokens']]) {
       addCoverage(parent, label, totals.usage?.[key]);
     }
+    const volume = clear('volume');
+    addMetric(volume, 'Recorded outcomes', format(totals.outcomes));
+    addCoverage(volume, 'Request bytes', totals.requestBytes);
+    addCoverage(volume, 'Response bytes', totals.responseBytes);
   }
 
   function renderIntegrity(totals) {
     const parent = clear('integrity');
     const flags = totals.transport || {};
-    for (const key of ['completed', 'cancelled', 'terminalEventObserved', 'responseObservationIncomplete', 'cancelledAfterTerminalEvent']) {
+    for (const [key, label] of [['completed', 'Transport completed'], ['cancelled', 'Cancelled'], ['terminalEventObserved', 'Terminal event observed'], ['responseObservationIncomplete', 'Known response incompleteness'], ['cancelledAfterTerminalEvent', 'Cancelled after terminal event']]) {
       const value = flags[key] || {};
-      addMetric(parent, key.replace(/[A-Z]/g, (letter) => ' ' + letter), format(value.yes) + ' yes', format(value.no) + ' no · ' + format(value.unavailable) + ' unavailable');
+      addMetric(parent, label, format(value.yes) + ' yes', format(value.no) + ' no · ' + format(value.unavailable) + ' unavailable');
     }
     const structure = totals.structure || {};
     addMetric(parent, 'Structure coverage', format(structure.available) + ' available · ' + format(structure.unavailable) + ' unavailable');
@@ -109,109 +324,156 @@ export const DASHBOARD_JS = `(() => {
     if (session.recurrence) {
       const summary = session.recurrence;
       const truncation = summary.groupsTruncated === null ? 'Truncation unavailable' : summary.groupsTruncated ? 'Tracker groups truncated' : 'Tracker groups not truncated';
-      const completeness = summary.comparisonIncomplete === null ? 'comparison status unavailable' : summary.comparisonIncomplete ? 'comparison incomplete' : 'comparison complete';
+      const completeness = summary.comparisonIncomplete === null ? 'comparison status unavailable' : summary.comparisonIncomplete ? 'comparison incomplete' : 'no known comparison incompleteness';
       addMetric(parent, 'Instance recurring groups', format(summary.recurringGroupCount), truncation + ' · ' + completeness + '; group details are not shown');
     }
   }
 
-  function cell(row, value, className = '') {
+  function cell(row, value, className = '', label = '') {
     const element = document.createElement('td');
-    element.textContent = value;
+    if (label) addText(element, label, 'cell-label');
+    addText(element, value, 'cell-value');
     if (className) element.className = className;
     row.append(element);
+    return element;
   }
 
   function boolLabel(value, yes, no, unknown) {
     return value === true ? yes : value === false ? no : unknown;
   }
 
+  let recentProjection = null;
   function renderRecent(records) {
+    // Keep open row disclosures while the presented records are unchanged.
+    const projection = JSON.stringify(records);
+    if (projection === recentProjection) return;
+    recentProjection = projection;
     const parent = clear('recent');
     if (!Array.isArray(records) || records.length === 0) {
       const row = document.createElement('tr');
+      row.className = 'empty-row';
       const empty = document.createElement('td');
       empty.colSpan = 9;
-      empty.className = 'muted';
-      empty.textContent = 'No recorded outcomes';
+      addText(empty, 'No recorded outcomes', 'empty-title');
+      addText(empty, 'Only requests explicitly routed through Inlay produce observations.');
+      const link = document.createElement('a');
+      link.textContent = 'Read scope & setup';
+      link.href = '#scope';
+      empty.append(link);
       row.append(empty);
       parent.append(row);
       return;
     }
     records.slice(0, 20).forEach((record) => {
       const row = document.createElement('tr');
-      cell(row, record.route, 'route');
-      cell(row, record.durationMs === null ? 'Unavailable' : format(record.durationMs) + ' ms');
-      cell(row, format(record.requestBytes));
-      cell(row, format(record.responseBytes));
-      cell(row, format(record.inputTokens));
-      cell(row, format(record.outputTokens));
-      cell(row, record.canonicalBytes === null ? (record.requestStructureUnavailableReason || 'Unavailable') : format(record.canonicalBytes) + ' bytes · ' + format(record.inputItems) + ' items');
-      cell(row, format(record.previouslySeenItems));
-      const transport = [
+      cell(row, record.route, 'route', 'Route');
+      cell(row, record.durationMs === null ? 'Unavailable' : format(record.durationMs) + ' ms', '', 'Duration');
+      cell(row, format(record.requestBytes), '', 'Request bytes');
+      cell(row, format(record.responseBytes), '', 'Response bytes');
+      cell(row, format(record.inputTokens), '', 'Input tokens');
+      cell(row, format(record.outputTokens), '', 'Output tokens');
+      cell(row, record.canonicalBytes === null ? (record.requestStructureUnavailableReason || 'Unavailable') : format(record.canonicalBytes) + ' bytes · ' + format(record.inputItems) + ' items', '', 'Structure');
+      cell(row, format(record.previouslySeenItems), '', 'Previously seen');
+      const transport = document.createElement('td');
+      addText(transport, 'Transport', 'cell-label');
+      const details = document.createElement('details');
+      const summary = document.createElement('summary');
+      summary.textContent = 'Response flags';
+      details.append(summary);
+      for (const value of [
         boolLabel(record.completed, 'completed', 'not completed', 'completion unavailable'),
         boolLabel(record.cancelled, 'cancelled', 'not cancelled', 'cancellation unavailable'),
         boolLabel(record.terminalEventObserved, 'terminal event', 'no terminal event', 'terminal status unavailable'),
         boolLabel(record.responseObservationIncomplete, 'Known response incompleteness: yes', 'Known response incompleteness: no', 'Response incompleteness unavailable'),
         boolLabel(record.recurrenceIncomplete, 'Known recurrence incompleteness: yes', 'Known recurrence incompleteness: no', 'Recurrence incompleteness unavailable'),
-      ].join(' · ');
-      cell(row, transport);
+      ]) {
+        const text = document.createElement('p');
+        text.textContent = value;
+        details.append(text);
+      }
+      transport.append(details);
+      row.append(transport);
       parent.append(row);
     });
   }
 
+  const historyDisclosures = new Map();
+  let historyInfo = null;
   function renderHistory(history) {
-    const parent = clear('history');
-    if (history?.status === 'off') {
-      addText(parent, 'History is off. Set INLAY_HISTORY_DIR to opt in to aggregate session summaries.');
-      if (history.reason) addText(parent, 'Status: ' + history.reason);
-      return;
-    }
+    const parent = $('history');
     if (history?.status !== 'ready') {
-      addText(parent, history?.reason || 'Historical summaries unavailable');
+      clear('history');
+      historyDisclosures.clear();
+      historyInfo = null;
+      const empty = document.createElement('div');
+      empty.className = 'history-empty';
+      const off = history?.status === 'off';
+      addText(empty, off ? 'History is off' : 'Historical summaries unavailable', 'empty-title');
+      const note = document.createElement('p');
+      note.textContent = off ? 'Current activity stays in memory. Set INLAY_HISTORY_DIR before starting Inlay to opt in to aggregate session summaries.'
+        : 'The history writer is unavailable. Current measurements and proxy forwarding continue independently.';
+      empty.append(note);
+      if (history.reason) addText(empty, 'Status: ' + history.reason, 'detail');
+      parent.append(empty);
       return;
     }
     const sessions = Array.isArray(history.sessions) ? history.sessions : [];
-    addText(parent, 'Showing ' + Math.min(20, sessions.length) + ' of ' + format(sessions.length) + ' retained summaries · retention limit ' + format(history.retentionSessions) + ' sessions', 'detail');
-    if (sessions.length === 0) {
-      addText(parent, 'No stored sessions');
-      return;
+    if (!historyInfo) {
+      clear('history');
+      historyInfo = addText(parent, '', 'detail');
     }
-    const table = document.createElement('table');
-    const head = document.createElement('thead');
-    const headerRow = document.createElement('tr');
-    ['Started', 'Ended', 'State', 'Outcomes', 'Input tokens', 'Output tokens', 'Response bytes', 'Known response incomplete', 'Recurrence incomplete', 'Transport completed', 'Cancelled', 'Admitted', 'Finalized'].forEach((label) => {
-      const header = document.createElement('th');
-      header.textContent = label;
-      headerRow.append(header);
-    });
-    head.append(headerRow);
-    table.append(head);
-    const body = document.createElement('tbody');
-    sessions.slice(0, 20).forEach((session) => {
-      const row = document.createElement('tr');
-      const totals = session.totals || {};
-      const flags = totals.transport || {};
-      const responseIncomplete = flags.responseObservationIncomplete || {};
-      const recurrenceIncomplete = totals.recurrence?.incomplete || {};
-      const completed = flags.completed || {};
-      const cancelled = flags.cancelled || {};
-      const lifecycle = session.lifecycle || {};
-      const values = [dateLabel(session.startedAt), session.endedAt ? dateLabel(session.endedAt) : 'Unknown / not ended', session.state, format(totals.outcomes), coverage(totals.usage?.inputTokens), coverage(totals.usage?.outputTokens), coverage(totals.responseBytes)];
-      cell(row, values[0] || 'Unavailable'); cell(row, values[1]); cell(row, values[2] || 'Unavailable'); cell(row, values[3]);
-      for (const value of values.slice(4)) cell(row, value.sum + ' (' + value.detail + ')');
-      for (const value of [responseIncomplete, recurrenceIncomplete, completed, cancelled]) {
-        cell(row, format(value.yes) + ' yes · ' + format(value.no) + ' no · ' + format(value.unavailable) + ' unavailable');
+    historyInfo.textContent = 'Showing ' + Math.min(20, sessions.length) + ' of ' + format(sessions.length) + ' retained summaries · retention limit ' + format(history.retentionSessions) + ' sessions' + (sessions.length === 0 ? ' · No stored sessions' : '');
+    const visible = sessions.slice(0, 20);
+    const keys = new Set(visible.map(session => session.sessionId));
+    for (const [key, nodes] of historyDisclosures) {
+      if (!keys.has(key)) { parent.removeChild(nodes.details); historyDisclosures.delete(key); }
+    }
+    visible.forEach((session, index) => {
+      let nodes = historyDisclosures.get(session.sessionId);
+      if (!nodes) {
+        const details = document.createElement('details');
+        details.className = 'saved-session';
+        const summary = document.createElement('summary');
+        const identity = document.createElement('span');
+        const date = addText(identity, '', 'session-date');
+        const description = addText(identity, '', 'session-description');
+        summary.append(identity);
+        const totalLabel = addText(summary, '', 'session-totals');
+        details.append(summary);
+        const metrics = document.createElement('div');
+        metrics.className = 'detail-metrics';
+        details.append(metrics);
+        nodes = { details, date, description, totalLabel, metrics };
+        historyDisclosures.set(session.sessionId, nodes);
       }
-      cell(row, format(lifecycle.admitted)); cell(row, format(lifecycle.finalized));
-      body.append(row);
+      // Reuse the disclosure and its summary so polling preserves focus and open state.
+      if (parent.children[index + 1] !== nodes.details) parent.insertBefore(nodes.details, parent.children[index + 1] || null);
+      nodes.date.textContent = dateLabel(session.startedAt);
+      const state = session.state === 'running' ? 'Running at last checkpoint' : session.state === 'closed' ? 'Closed' : 'End state unknown';
+      nodes.description.textContent = state + ' · ' + (session.endedAt ? 'Ended ' + dateLabel(session.endedAt) : 'Unknown / not ended');
+      const totals = session.totals || {};
+      nodes.totalLabel.textContent = format(totals.outcomes) + ' outcomes · View summary';
+      const metrics = nodes.metrics;
+      while (metrics.firstChild) metrics.removeChild(metrics.firstChild);
+      addMetric(metrics, 'Checkpoint updated', dateLabel(session.updatedAt));
+      addCoverage(metrics, 'Input tokens', totals.usage?.inputTokens);
+      addCoverage(metrics, 'Output tokens', totals.usage?.outputTokens);
+      addCoverage(metrics, 'Response bytes', totals.responseBytes);
+      for (const [label, value] of [
+        ['Known response incomplete', totals.transport?.responseObservationIncomplete],
+        ['Recurrence incomplete', totals.recurrence?.incomplete],
+        ['Transport completed', totals.transport?.completed], ['Cancelled', totals.transport?.cancelled]
+      ]) addMetric(metrics, label, format(value?.yes) + ' yes · ' + format(value?.no) + ' no · ' + format(value?.unavailable) + ' unavailable');
+      addMetric(metrics, 'Admitted', format(session.lifecycle?.admitted));
+      addMetric(metrics, 'Finalized', format(session.lifecycle?.finalized));
+
     });
-    table.append(body);
-    parent.append(table);
   }
 
   function render(data) {
     const session = data.current;
     const totals = session.totals;
+    renderContext(session, totals, data.modes || {});
     const state = $('session-state');
     state.textContent = session.state === 'running' ? 'Running' : session.state === 'closed' ? 'Closed' : 'End state unknown';
     renderLifecycle(session, data.modes || {});
@@ -237,12 +499,12 @@ export const DASHBOARD_JS = `(() => {
       if (data?.version !== 1 || !data.current?.totals) throw new Error('Invalid dashboard data');
       render(data);
       lastSuccess = true;
-      $('connection').textContent = 'Live';
+      if ($('connection').textContent !== 'Live') $('connection').textContent = 'Live';
       $('connection').className = 'connection';
       $('updated').textContent = 'Updated ' + timestamp();
       $('notice').hidden = true;
     } catch (_) {
-      $('connection').textContent = 'Offline';
+      if ($('connection').textContent !== 'Offline') $('connection').textContent = 'Offline';
       $('connection').className = 'connection offline';
       $('notice').textContent = lastSuccess
         ? 'Connection lost. Showing the last successful update; values may be stale.'

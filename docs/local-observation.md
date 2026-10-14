@@ -9,7 +9,11 @@ Start the source checkout containing M2, then open `http://127.0.0.1:8787/` or
 `http://127.0.0.1:8787/dashboard`. The same loopback service serves the page and
 its assets; no separate frontend build, account or internet connection is needed.
 Existing harness routing and authentication stay unchanged. The dashboard uses a
-dark theme.
+dark theme with section navigation and a responsive activity layout. Runtime
+counts lead the overview; usage totals show field coverage alongside values.
+Integrity, recurrence, response flags and saved session details expand on demand.
+Scope and setup guidance explains routing, retention and measurement limits.
+Saved session disclosures retain their open state and focus across checkpoints.
 
 Only traffic explicitly routed through Inlay is observed. Keeping the service
 running does not discover other open coding agents. Multiple clients using the
