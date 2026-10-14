@@ -35,6 +35,16 @@ try {
   assert.ok(health, "Release CLI startup watchdog expired.");
   assert.equal(health.status, 200);
   assert.deepEqual(health.value, { status: "ok", upstreamConfigured: false, mode: "transparent" });
+  const dashboard = await fetch(base + "/dashboard", { signal: AbortSignal.timeout(1_000) });
+  assert.equal(dashboard.status, 200);
+  assert.match(await dashboard.text(), /Local observation/);
+  const asset = await fetch(base + "/dashboard/app.js", { signal: AbortSignal.timeout(1_000) });
+  assert.equal(asset.status, 200);
+  assert.match(await asset.text(), /\/dashboard\/data/);
+  const view = await read("/dashboard/data");
+  assert.equal(view.value.current.totals.outcomes, 0);
+  assert.equal(view.value.current.totals.usage.inputTokens.sum, null);
+  assert.equal(view.value.history.status, "off");
   const idle = await read("/metrics");
   assert.equal(idle.status, 200);
   assert.equal(idle.value.totalRequests, 0);

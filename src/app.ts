@@ -1,10 +1,12 @@
 import { Readable, Transform } from "node:stream";
 import { pipeline } from "node:stream/promises";
-import { createServer, type IncomingMessage, type Server, type ServerResponse } from "node:http";
+import { request as httpRequest, createServer, type IncomingHttpHeaders, type IncomingMessage, type OutgoingHttpHeaders, type Server, type ServerResponse } from "node:http";
+import { request as httpsRequest } from "node:https";
 import type { ProxyConfig } from "./config.ts";
 import { copyResponseHeaders, forwardHeaders, readBody, sendJson } from "./http.ts";
 import { MetricsStore } from "./metrics.ts";
 import { ExchangeLifecycle } from "./exchange-lifecycle.ts";
+import { LocalDashboard, isDashboardRequest } from "./local-dashboard.ts";
 import {
   deriveResponsesRequestStructure,
   ExactItemRecurrenceTracker,
@@ -22,6 +24,96 @@ function isSupportedExchange(request: IncomingMessage): boolean {
     || request.url === "/v1/responses"
     || request.url === "/v1/codex/responses"
   );
+}
+
+function withoutHopByHopHeaders(headers: IncomingHttpHeaders): OutgoingHttpHeaders {
+  const connectionTokens = String(headers.connection ?? "")
+    .split(",")
+    .map((name) => name.trim().toLowerCase())
+    .filter(Boolean);
+  const excluded = new Set([
+    "connection", "keep-alive", "proxy-authenticate", "proxy-authorization",
+    "te", "trailer", "transfer-encoding", "upgrade", "host", ...connectionTokens,
+  ]);
+  const result: OutgoingHttpHeaders = {};
+  for (const [name, value] of Object.entries(headers)) {
+    if (value !== undefined && !excluded.has(name.toLowerCase())) result[name] = value;
+  }
+  return result;
+}
+
+function copyRawResponseHeaders(source: IncomingHttpHeaders, target: ServerResponse): void {
+  const connectionTokens = String(source.connection ?? "")
+    .split(",")
+    .map((name) => name.trim().toLowerCase())
+    .filter(Boolean);
+  const excluded = new Set([
+    "connection", "keep-alive", "proxy-authenticate", "proxy-authorization",
+    "te", "trailer", "transfer-encoding", "upgrade", ...connectionTokens,
+  ]);
+  for (const [name, value] of Object.entries(source)) {
+    if (value !== undefined && !excluded.has(name.toLowerCase())) target.setHeader(name, value);
+  }
+}
+
+async function forwardModelsMetadata(config: ProxyConfig, request: IncomingMessage, response: ServerResponse): Promise<void> {
+  if (!config.upstreamBaseUrl) {
+    sendJson(response, 503, { error: { code: "inlay_upstream_not_configured", message: "Set INLAY_UPSTREAM_BASE_URL to enable forwarding." } });
+    return;
+  }
+
+  const upstreamBase = new URL(config.upstreamBaseUrl);
+  upstreamBase.search = "";
+  upstreamBase.hash = "";
+  upstreamBase.pathname = `${upstreamBase.pathname.replace(/\/$/, "")}/`;
+  const upstreamUrl = new URL("models", upstreamBase);
+  const incomingTarget = request.url ?? "/v1/models";
+  const queryStart = incomingTarget.indexOf("?");
+  upstreamUrl.search = queryStart >= 0 ? incomingTarget.slice(queryStart) : "";
+  const transport = upstreamUrl.protocol === "https:" ? httpsRequest : httpRequest;
+  let timedOut = false;
+  let clientDisconnected = false;
+  let upstreamRequest: ReturnType<typeof httpRequest> | undefined;
+  const cancel = () => {
+    if (!response.writableEnded) {
+      clientDisconnected = true;
+      upstreamRequest?.destroy();
+    }
+  };
+  request.once("aborted", cancel);
+  response.once("close", cancel);
+
+  const timeout = setTimeout(() => {
+    timedOut = true;
+    upstreamRequest?.destroy();
+  }, config.upstreamTimeoutMs);
+
+  try {
+    await new Promise<void>((resolve, reject) => {
+      upstreamRequest = transport(upstreamUrl, { method: "GET", headers: withoutHopByHopHeaders(request.headers) }, (upstreamResponse) => {
+        copyRawResponseHeaders(upstreamResponse.headers, response);
+        response.writeHead(upstreamResponse.statusCode ?? 502, upstreamResponse.statusMessage);
+        void pipeline(upstreamResponse, response).then(resolve, reject);
+      });
+      upstreamRequest.once("error", reject);
+      upstreamRequest.end();
+    });
+  } catch {
+    if (!clientDisconnected && !response.headersSent) {
+      sendJson(response, timedOut ? 504 : 502, {
+        error: {
+          code: timedOut ? "inlay_upstream_timeout" : "inlay_upstream_unavailable",
+          message: "The upstream provider could not complete this request.",
+        },
+      });
+    } else if (!response.writableEnded) {
+      response.destroy();
+    }
+  } finally {
+    clearTimeout(timeout);
+    request.removeListener("aborted", cancel);
+    response.removeListener("close", cancel);
+  }
 }
 
 function invokeUpstreamFetch(
@@ -239,7 +331,12 @@ export function createInlayServer(config: ProxyConfig, metrics = new MetricsStor
   const recurrenceTracker = config.recurrenceProbe === "exact-item"
     ? new ExactItemRecurrenceTracker(config.semanticInspection === "role-categories")
     : undefined;
+  const dashboard = new LocalDashboard(config, metrics, exchangeLifecycle, recurrenceTracker);
   async function handleRequest(request: IncomingMessage, response: ServerResponse): Promise<void> {
+    if (isDashboardRequest(request)) {
+      await dashboard.handle(request, response);
+      return;
+    }
     if (request.method === "GET" && request.url === "/health") {
       sendJson(response, 200, { status: "ok", upstreamConfigured: Boolean(config.upstreamBaseUrl), mode: "transparent" });
       return;
@@ -250,6 +347,16 @@ export function createInlayServer(config: ProxyConfig, metrics = new MetricsStor
         exchangeLifecycle: exchangeLifecycle.snapshot(),
         ...(recurrenceTracker ? { exactItemRecurrence: recurrenceTracker.snapshot() } : {}),
       });
+      return;
+    }
+    if (request.method === "GET" && (request.url === "/v1/models" || request.url?.startsWith("/v1/models?") === true)) {
+      const contentLength = request.headers["content-length"];
+      if ((contentLength !== undefined && contentLength !== "0") || request.headers["transfer-encoding"] !== undefined) {
+        sendJson(response, 400, { error: { code: "inlay_invalid_request", message: "GET /v1/models does not accept a request body." } });
+        request.resume();
+        return;
+      }
+      await forwardModelsMetadata(config, request, response);
       return;
     }
     if (request.method === "POST" && request.url === "/v1/chat/completions") {
@@ -264,10 +371,10 @@ export function createInlayServer(config: ProxyConfig, metrics = new MetricsStor
       await forwardModelRequest(config, metrics, exchangeLifecycle, request, response, "responses", "/v1/codex/responses", recurrenceTracker);
       return;
     }
-    sendJson(response, 404, { error: { code: "inlay_route_not_found", message: "Supported routes: GET /health, GET /metrics, POST /v1/chat/completions, POST /v1/responses, POST /v1/codex/responses." } });
+    sendJson(response, 404, { error: { code: "inlay_route_not_found", message: "Supported routes: GET /health, GET /metrics, GET /v1/models, POST /v1/chat/completions, POST /v1/responses, POST /v1/codex/responses." } });
   }
 
-  return createServer((request, response) => {
+  const server = createServer((request, response) => {
     const admitted = isSupportedExchange(request);
     if (admitted) exchangeLifecycle.admit();
     const originalCallbackPromise = handleRequest(request, response);
@@ -280,4 +387,6 @@ export function createInlayServer(config: ProxyConfig, metrics = new MetricsStor
       },
     );
   });
+  dashboard.attach(server);
+  return server;
 }

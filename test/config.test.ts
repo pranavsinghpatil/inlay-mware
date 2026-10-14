@@ -54,3 +54,12 @@ test("reads an OpenAI-compatible upstream endpoint", () => {
   assert.equal(config.upstreamBaseUrl?.href, "https://example.test/v1");
 });
 
+
+test("aggregate history is opt-in and its session retention is bounded", () => {
+  assert.equal(loadConfig({}).historyDirectory, undefined);
+  assert.equal(loadConfig({}).historyMaxSessions, 20);
+  assert.equal(loadConfig({ INLAY_HISTORY_DIR: ".inlay/history", INLAY_HISTORY_MAX_SESSIONS: "2" }).historyMaxSessions, 2);
+  for (const value of ["0", "101", "-1", "2.5", "12junk", "1e2"]) {
+    assert.throws(() => loadConfig({ INLAY_HISTORY_MAX_SESSIONS: value }), /INLAY_HISTORY_MAX_SESSIONS/);
+  }
+});

@@ -34,6 +34,9 @@ generalized reliability and measured developer benefit have not been established
 | --- | --- |
 | `GET /health` | Local server and upstream-configuration status |
 | `GET /metrics` | Process-local measurement snapshot |
+| `GET /`, `GET /dashboard` | Local observation page (unreleased M2) |
+| `GET /dashboard/data` | Approved presentation snapshot (unreleased M2) |
+| `GET /v1/models` | Unobserved model-catalog pass-through (unreleased M2) |
 | `POST /v1/responses` | Codex HTTP Responses profile |
 | `POST /v1/codex/responses` | Narrow Pi Codex Responses alias |
 | `POST /v1/chat/completions` | Synthetic-tested compatibility route |
@@ -41,7 +44,10 @@ generalized reliability and measured developer benefit have not been established
 Codex routing was validated for the recorded HTTP Responses profile.
 One Pi 0.86.0 experiment validated the explicitly loaded adapter and alias.
 These results do not establish general Codex, Pi or multi-harness compatibility.
-Model discovery and WebSocket transport are unsupported.
+The unreleased M2 candidate adds model-catalog forwarding without catalog
+retention or exchange accounting. WebSocket transport remains unsupported.
+See [Codex desktop HTTP setup](docs/codex-desktop.md); real desktop compatibility
+requires verification after configuration and restart.
 
 Requests are buffered within the configured body limit. Upstream response bytes,
 including SSE, pass through without semantic rewriting.
@@ -89,6 +95,19 @@ attribute forwarding to individual active handlers.
 See [measurement definitions](docs/measurements.md) for availability, units,
 scope, retention and interpretation limits. Synthetic tests establish the stated
 technical behavior; they do not establish usefulness or efficiency.
+
+## Local observation surface (unreleased M2)
+
+The development dashboard at `http://127.0.0.1:8787/` presents existing lifecycle,
+reported usage/coverage, observation integrity, structure/recurrence and recent
+approved outcomes. It polls locally every two seconds. Missing measurements stay
+unavailable; no task interpretation or optimization recommendations are added.
+
+Local history is opt-in through `INLAY_HISTORY_DIR`. It stores bounded aggregate
+session summaries, never recent request rows or workload content. The default
+retention is 20 sessions, configurable from 1 to 100; files are capped at 2 MiB.
+See [daily-use setup and persistence boundaries](docs/local-observation.md).
+This surface is development work and is not part of accepted v0.1.0.
 
 ## Privacy and retention
 
