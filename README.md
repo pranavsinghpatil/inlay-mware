@@ -36,6 +36,7 @@ generalized reliability and measured developer benefit have not been established
 | `GET /metrics` | Process-local measurement snapshot |
 | `GET /`, `GET /dashboard` | Local observation page (unreleased M2) |
 | `GET /dashboard/data` | Approved presentation snapshot (unreleased M2) |
+| `GET /v1/models` | Unobserved model-catalog pass-through (unreleased M2) |
 | `POST /v1/responses` | Codex HTTP Responses profile |
 | `POST /v1/codex/responses` | Narrow Pi Codex Responses alias |
 | `POST /v1/chat/completions` | Synthetic-tested compatibility route |
@@ -43,7 +44,10 @@ generalized reliability and measured developer benefit have not been established
 Codex routing was validated for the recorded HTTP Responses profile.
 One Pi 0.86.0 experiment validated the explicitly loaded adapter and alias.
 These results do not establish general Codex, Pi or multi-harness compatibility.
-Model discovery and WebSocket transport are unsupported.
+The unreleased M2 candidate adds model-catalog forwarding without catalog
+retention or exchange accounting. WebSocket transport remains unsupported.
+See [Codex desktop HTTP setup](docs/codex-desktop.md); real desktop compatibility
+requires verification after configuration and restart.
 
 Requests are buffered within the configured body limit. Upstream response bytes,
 including SSE, pass through without semantic rewriting.

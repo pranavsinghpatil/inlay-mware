@@ -16,6 +16,10 @@
 - Keep recent request rows, identifiers, raw workload content, configuration URLs
   and filesystem paths out of history. No telemetry or optimization is added.
 
+- Add fixed `GET /v1/models` pass-through for client discovery, preserving catalog
+  bytes, status and end-to-end headers. Catalog requests are excluded from
+  measurements and history. Document opt-in Codex desktop HTTP configuration.
+
 No M2 version or publication is declared. Daily-use usefulness is unmeasured.
 
 ## Unreleased — proposed v0.1.1

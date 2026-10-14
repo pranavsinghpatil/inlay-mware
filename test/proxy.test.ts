@@ -350,7 +350,7 @@ test("forwards the exact Pi Codex Responses alias request without interpreting i
   }
 });
 
-test("keeps Pi model discovery and non-POST alias requests unsupported", async () => {
+test("forwards GET model discovery while keeping non-POST alias requests unsupported", async () => {
   const proxy = createInlayServer({
     host: "127.0.0.1",
     port: 0,
@@ -362,12 +362,13 @@ test("keeps Pi model discovery and non-POST alias requests unsupported", async (
   const proxyPort = await listen(proxy);
 
   try {
-    for (const path of ["/v1/models", "/v1/codex/responses"]) {
-      const response = await fetch(`http://127.0.0.1:${proxyPort}${path}`);
-      assert.equal(response.status, 404);
-      const body = await response.json() as { error?: { code?: string } };
-      assert.equal(body.error?.code, "inlay_route_not_found");
-    }
+    const models = await fetch(`http://127.0.0.1:${proxyPort}/v1/models`);
+    assert.equal(models.status, 502);
+    assert.equal((await models.json() as { error?: { code?: string } }).error?.code, "inlay_upstream_unavailable");
+
+    const alias = await fetch(`http://127.0.0.1:${proxyPort}/v1/codex/responses`);
+    assert.equal(alias.status, 404);
+    assert.equal((await alias.json() as { error?: { code?: string } }).error?.code, "inlay_route_not_found");
   } finally {
     await close(proxy);
   }

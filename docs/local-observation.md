@@ -169,7 +169,9 @@ routes, without dependencies or a new provider observation boundary.
 Inlay observes compatible HTTP traffic explicitly routed through its configured
 upstream. Keeping it running, including through a local Windows sign-in task,
 does not observe this chat, discover other applications, establish per-agent
-identity or cover WebSocket/model-discovery routes. Enable aggregate history
+identity or cover WebSocket traffic. The unreleased `GET /v1/models` route
+forwards discovery without observation or retention; it does not populate
+exchange counts. See [Codex desktop setup](codex-desktop.md). Enable aggregate history
 before starting it, then verify admitted and recorded outcome counts during a
 normal client session before claiming real-data collection. A healthy dashboard
 alone does not verify client routing or provider receipt.
