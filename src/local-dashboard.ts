@@ -1,3 +1,4 @@
+import { readFileSync } from "node:fs";
 import { randomUUID } from "node:crypto";
 import type { IncomingMessage, Server, ServerResponse } from "node:http";
 import type { ProxyConfig } from "./config.ts";
@@ -8,10 +9,13 @@ import { sendJson } from "./http.ts";
 import { ObservationAccumulator, projectRecent, projectRecurrence } from "./local-observation.ts";
 import { LocalHistory, type SessionSummary } from "./local-history.ts";
 import { DASHBOARD_HTML, DASHBOARD_CSS, DASHBOARD_JS } from "./dashboard.ts";
+import { DASHBOARD_EXPORT_JS } from "./dashboard-export.ts";
+
+const DASHBOARD_LOGO = readFileSync(new URL("../assets/inlay-mark.png", import.meta.url));
 
 const REFRESH_MS = 2_000;
 const CHECKPOINT_MS = 5_000;
-const paths = new Set(["/", "/dashboard", "/dashboard/", "/dashboard/data", "/dashboard/style.css", "/dashboard/app.js"]);
+const paths = new Set(["/", "/dashboard", "/dashboard/", "/dashboard/data", "/dashboard/style.css", "/dashboard/app.js", "/dashboard/logo.png", "/dashboard/export.js"]);
 
 export function isDashboardRequest(request: IncomingMessage): boolean {
   return request.method === "GET" && paths.has(request.url ?? "");
@@ -91,7 +95,7 @@ export class LocalDashboard {
     response.setHeader("X-Content-Type-Options", "nosniff");
     response.setHeader("Referrer-Policy", "no-referrer");
     response.setHeader("Cross-Origin-Resource-Policy", "same-origin");
-    response.setHeader("Content-Security-Policy", "default-src 'none'; script-src 'self'; style-src 'self'; connect-src 'self'; base-uri 'none'; frame-ancestors 'none'; form-action 'none'");
+    response.setHeader("Content-Security-Policy", "default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self'; connect-src 'self'; base-uri 'none'; frame-ancestors 'none'; form-action 'none'");
     if (!localBrowserRequest(request)) {
       sendJson(response, 403, { error: { code: "inlay_dashboard_local_only" } });
       return true;
@@ -112,7 +116,13 @@ export class LocalDashboard {
       });
       return true;
     }
-    const [type, body] = request.url === "/dashboard/style.css" ? ["text/css", DASHBOARD_CSS]
+    if (request.url === "/dashboard/logo.png") {
+      response.writeHead(200, { "Content-Type": "image/png" });
+      response.end(DASHBOARD_LOGO);
+      return true;
+    }
+    const [type, body] = request.url === "/dashboard/export.js" ? ["text/javascript", DASHBOARD_EXPORT_JS]
+      : request.url === "/dashboard/style.css" ? ["text/css", DASHBOARD_CSS]
       : request.url === "/dashboard/app.js" ? ["text/javascript", DASHBOARD_JS]
       : ["text/html", DASHBOARD_HTML];
     response.writeHead(200, { "Content-Type": `${type}; charset=utf-8` });

@@ -13,7 +13,11 @@ class Element {
   hidden = false;
   colSpan = 1;
   open = false;
+  value = "";
+  private listeners = new Map<string, (() => void)[]>();
   append(...elements: Element[]) { this.children.push(...elements); }
+  addEventListener(type: string, listener: () => void) { this.listeners.set(type, [...(this.listeners.get(type) ?? []), listener]); }
+  dispatch(type: string) { for (const listener of this.listeners.get(type) ?? []) listener(); }
   insertBefore(element: Element, reference: Element | null) {
     const old = this.children.indexOf(element);
     if (old >= 0) this.children.splice(old, 1);
@@ -26,13 +30,16 @@ class Element {
 
 function harness(fetchImpl: (...args: unknown[]) => Promise<unknown>) {
   const elements = new Map<string, Element>();
+  const events: { type: string; detail: unknown }[] = [];
   const timers: { callback: () => void; delay: number }[] = [];
   const document = {
     getElementById(id: string) { if (!elements.has(id)) elements.set(id, new Element()); return elements.get(id)!; },
     createElement(_tag: string) { return new Element(); },
+    dispatchEvent(event: { type: string; detail: unknown }) { events.push(event); return true; },
   };
   vm.runInNewContext(constants.DASHBOARD_JS, {
     document,
+    CustomEvent: class { type: string; detail: unknown; constructor(type: string, init: { detail: unknown }) { this.type = type; this.detail = init.detail; } },
     fetch: fetchImpl,
     AbortController,
     Intl,
@@ -41,7 +48,7 @@ function harness(fetchImpl: (...args: unknown[]) => Promise<unknown>) {
     clearTimeout() {},
   });
   const flatten = (element: Element): string => element.textContent + element.children.map(flatten).join(" ");
-  return { elements, timers, flatten };
+  return { elements, timers, events, flatten };
 }
 
 function payload() {
@@ -60,13 +67,16 @@ function payload() {
       }, lifecycle: { admitted: 2, active: 1, forwarding: 1, finalized: 1, availability: "AVAILABLE", incomplete: false, unavailableReason: null },
       recurrence: { recurringGroupCount: 3, groupsTruncated: false, comparisonIncomplete: false },
     },
-    recent: [{ route: "/v1/responses", durationMs: 18, requestBytes: 12, responseBytes: null, inputTokens: 12, outputTokens: null, cachedInputTokens: 2, canonicalBytes: 20, inputItems: 2, previouslySeenItems: 1, completed: true, cancelled: false, terminalEventObserved: true, responseObservationIncomplete: false, requestStructureUnavailableReason: null, recurrenceIncomplete: false }],
+    recent: [{ route: "/v1/responses", durationMs: 18, requestBytes: 12, responseBytes: null, inputTokens: 12 as number | null, outputTokens: null, cachedInputTokens: 2, canonicalBytes: 20, inputItems: 2, previouslySeenItems: 1, completed: true, cancelled: false, terminalEventObserved: true, responseObservationIncomplete: false, requestStructureUnavailableReason: null, recurrenceIncomplete: false }],
     history: { status: "off", reason: null as string | null, retentionSessions: 20, sessions: [] as object[] }, refreshMs: 2000, checkpointMs: 5000,
   };
 }
 
 test("dashboard markup is self-hosted and has accessible status regions", () => {
   assert.match(constants.DASHBOARD_HTML, /aria-live="polite"/);
+  assert.match(constants.DASHBOARD_HTML, /id="recent-transport"/);
+  assert.match(constants.DASHBOARD_HTML, /id="history-from"/);
+  assert.doesNotMatch(constants.DASHBOARD_HTML, /class="activity-summary"/);
   assert.match(constants.DASHBOARD_HTML, /\/dashboard\/style\.css/);
   assert.match(constants.DASHBOARD_HTML, /\/dashboard\/app\.js/);
   assert.doesNotMatch(constants.DASHBOARD_HTML, /https?:\/\//);
@@ -96,7 +106,7 @@ test("renders coverage, approved summaries and missing values without inventing 
   const historyDashboard = harness(async () => ({ ok: true, json: async () => data }));
   await new Promise(resolve => setImmediate(resolve));
   const history = historyDashboard.flatten(historyDashboard.elements.get("history")!);
-  assert.match(history, /Showing 1 of 1 retained summaries/);
+  assert.match(historyDashboard.elements.get("history-count")!.textContent, /1 of 1 retained summaries/);
   assert.match(history, /12 sessions/);
   assert.match(history, /1 available · 1 missing/);
   assert.match(history, /Known response incomplete/);
@@ -193,4 +203,74 @@ test("polling keeps history disclosure nodes and open state while checkpoints up
   assert.equal(disclosure.open, true);
   assert.match(h.flatten(disclosure), /3 outcomes/);
   assert.equal(h.elements.get("recent")!.children[0], recentRow);
+});
+
+test("recent filters stay within retained outcomes and distinguish no matches from no outcomes", async () => {
+  const data = payload();
+  data.recent.push({ ...data.recent[0], route: "/v1/chat/completions", inputTokens: null, completed: false, cancelled: true, responseObservationIncomplete: true });
+  const h = harness(async () => ({ ok: true, json: async () => data }));
+  await new Promise(resolve => setImmediate(resolve));
+  const route = h.elements.get("recent-route")!;
+  route.value = "/v1/chat/completions";
+  route.dispatch("change");
+  assert.match(h.elements.get("recent-count")!.textContent, /1 of 2 retained outcomes/);
+  assert.match(h.flatten(h.elements.get("recent")!), /\/v1\/chat\/completions/);
+  assert.doesNotMatch(h.flatten(h.elements.get("recent")!), /\/v1\/responses/);
+  const usage = h.elements.get("recent-usage")!;
+  usage.value = "available";
+  usage.dispatch("change");
+  assert.match(h.elements.get("recent-count")!.textContent, /0 of 2 retained outcomes · No matches/);
+  assert.match(h.flatten(h.elements.get("recent")!), /No outcomes match these filters/);
+  const view = h.events.filter(event => event.type === "inlay:view").at(-1)!.detail as { recent?: unknown[]; selection: Record<string, string> };
+  assert.equal(view.recent, undefined);
+  assert.equal(view.selection["recent-usage"], undefined);
+});
+
+test("history filters use bounded stored summaries, date bounds and order", async () => {
+  const data = payload();
+  const older = { ...data.current, sessionId: "older", startedAt: "2025-12-01T00:00:00.000Z", state: "closed" };
+  const newer = { ...data.current, sessionId: "newer", startedAt: "2026-02-01T00:00:00.000Z", state: "running" };
+  data.history = { status: "ready", reason: null, retentionSessions: 20, sessions: [newer, older] };
+  const h = harness(async () => ({ ok: true, json: async () => data }));
+  await new Promise(resolve => setImmediate(resolve));
+  assert.match(h.elements.get("history-count")!.textContent, /2 of 2 retained summaries/);
+  const state = h.elements.get("history-state")!;
+  state.value = "closed";
+  state.dispatch("change");
+  assert.match(h.elements.get("history-count")!.textContent, /1 of 2 retained summaries/);
+  assert.match(h.flatten(h.elements.get("history")!), /Closed/);
+  assert.doesNotMatch(h.flatten(h.elements.get("history")!), /Running at last checkpoint/);
+  state.value = "";
+  state.dispatch("change");
+  const order = h.elements.get("history-order")!;
+  order.value = "oldest";
+  order.dispatch("change");
+  const firstSession = h.elements.get("history")!.children[1];
+  assert.match(h.flatten(firstSession), /12\/1\/2025/);
+  const from = h.elements.get("history-from")!;
+  from.value = "2026-01-01";
+  from.dispatch("change");
+  assert.match(h.elements.get("history-count")!.textContent, /1 of 2 retained summaries/);
+  const to = h.elements.get("history-to")!;
+  to.value = "2025-12-01";
+  to.dispatch("change");
+  assert.match(h.elements.get("history-count")!.textContent, /0 of 2 retained summaries · Start-date range is reversed/);
+});
+
+
+test("history filters include older retained summaries beyond the recent twenty and route choice survives eviction", async () => {
+  const data = payload();
+  data.history = { status: "ready", reason: null, retentionSessions: 30, sessions: Array.from({ length: 25 }, (_, index) => ({ ...data.current, sessionId: "saved-" + index, state: index === 24 ? "closed" : "running" })) };
+  const h = harness(async () => ({ ok: true, json: async () => data }));
+  await new Promise(resolve => setImmediate(resolve));
+  const state = h.elements.get("history-state")!;
+  state.value = "closed"; state.dispatch("change");
+  assert.match(h.elements.get("history-count")!.textContent, /1 of 25 retained summaries/);
+  assert.equal(h.elements.get("history-filters")!.hidden, false);
+  const route = h.elements.get("recent-route")!;
+  route.value = "/v1/responses"; route.dispatch("change");
+  data.recent = [];
+  h.timers.find(timer => timer.delay === 2000)!.callback();
+  await new Promise(resolve => setImmediate(resolve));
+  assert.equal(route.value, "/v1/responses");
 });

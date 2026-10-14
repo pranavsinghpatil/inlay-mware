@@ -2,13 +2,13 @@ export const DASHBOARD_HTML = `<!doctype html>
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="color-scheme" content="dark"><title>Inlay · Local observation</title><link rel="stylesheet" href="/dashboard/style.css"></head>
 <body>
 <a class="skip-link" href="#main">Skip to observations</a>
-<header class="top"><a href="/" class="brand" aria-label="Inlay home"><svg width="22" height="22" viewBox="0 0 22 22" aria-hidden="true"><path fill="currentColor" d="M2 2h8v8H2zm10 0h8v8h-8zM2 12h8v8H2z"/><path fill="currentColor" opacity=".4" d="M12 12h8v8h-8z"/></svg>Inlay</a><span class="subtitle">Local observation</span><div class="connection-wrap"><span class="connection-label">Dashboard</span><span id="connection" class="connection" role="status" aria-live="polite">Connecting…</span></div></header>
+<header class="top"><a href="/" class="brand" aria-label="Inlay home"><img src="/dashboard/logo.png" width="26" height="26" alt="">Inlay</a><span class="subtitle">Local observation</span><div class="connection-wrap"><span class="connection-label">Dashboard</span><span id="connection" class="connection" role="status" aria-live="polite">Connecting…</span></div></header>
 <div class="workspace">
-<aside class="sidebar"><nav aria-label="Observation sections"><a href="#overview">Overview</a><a href="#reported-usage">Reported usage</a><a href="#recent-activity">Recent activity</a><a href="#saved-sessions">Saved sessions</a><a href="#scope">Scope &amp; setup</a></nav><p class="sidebar-note">On this machine.<br>Aggregate evidence only.</p></aside>
+<aside class="sidebar"><nav aria-label="Observation sections"><a href="#overview">Overview</a><a href="#reported-usage">Reported usage</a><a href="#recent-activity">Recent activity</a><a href="#saved-sessions">Saved sessions</a><a href="#scope">Scope &amp; setup</a></nav><p class="sidebar-note">On this machine.<br>Content-free measurements.</p></aside>
 <main id="main">
-<section id="overview" class="overview"><div class="page-heading"><h1>Local observation</h1><p id="updated" class="updated">Waiting for first update</p></div><p class="intro">Activity routed through this Inlay instance.</p>
+<section id="overview" class="overview"><div class="page-heading"><h1>Local observation</h1><div class="export-actions" aria-label="Export aggregate summaries"><button id="export-json" type="button" disabled>Export JSON</button><button id="export-csv" type="button" disabled>Export CSV</button></div></div><p id="updated" class="updated">Waiting for first update</p><p id="export-status" class="export-status" role="status" aria-live="polite"></p><p class="intro">Activity routed through this Inlay instance.</p>
 <div id="notice" class="notice" role="status" aria-live="polite" hidden></div>
-<div class="activity-summary"><div><h2 id="activity-title">Waiting for observations</h2><p id="activity-description">Connecting to the local dashboard. Measurement values have not loaded.</p></div><span id="session-state" class="session-state">Unavailable</span></div>
+<p class="activity-state"><strong id="activity-title">Waiting for observations</strong><span id="activity-description">Connecting to the local dashboard. Measurement values have not loaded.</span><span id="session-state" class="session-state">Unavailable</span></p>
 <div id="lifecycle" class="lifecycle" aria-label="Exchange lifecycle"></div>
 <details class="definition"><summary>How to read these counts</summary><p>Admitted counts handler entries. Active counts handlers still open. Forwarding counts local calls to the upstream request function. Finalized counts normally closed handlers. They do not establish provider receipt or task success.</p><p>A session is this server instance's lifetime. Several clients using it contribute to combined totals; there is no per-agent attribution.</p></details>
 </section>
@@ -17,11 +17,11 @@ export const DASHBOARD_HTML = `<!doctype html>
 <details class="measurement"><summary><span><strong>Integrity &amp; structure</strong><span id="integrity-brief" class="disclosure-note">Observation coverage and response flags</span></span><span class="disclosure-action" aria-hidden="true">Details</span></summary><div class="disclosure-body"><p class="support-copy">Yes / no / unavailable describes each recorded flag. No known incompleteness does not prove exhaustive observation. Canonical bytes measure structure, not tokens.</p><div id="integrity" class="detail-metrics"></div></div></details>
 <details class="measurement"><summary><span><strong>Exact recurrence</strong><span id="recurrence-brief" class="disclosure-note">Previously seen canonical items</span></span><span class="disclosure-action" aria-hidden="true">Details</span></summary><div class="disclosure-body"><p class="support-copy">Matches are exact canonical items seen within this process. They do not establish redundant work, removable context or potential savings.</p><div id="recurrence" class="detail-metrics"></div></div></details>
 </section>
-<section id="recent-activity" class="section"><div class="section-heading"><h2>Recent activity</h2><span class="section-note">Latest 20 outcomes</span></div><p class="support-copy">Approved outcome summaries. No prompts, source or tool output.</p><div class="table-wrap"><table class="recent-table"><caption class="visually-hidden">Recent recorded outcome measurements</caption><thead><tr><th scope="col">Route</th><th scope="col">Duration</th><th scope="col">Request bytes</th><th scope="col">Response bytes</th><th scope="col">Input tokens</th><th scope="col">Output tokens</th><th scope="col">Structure</th><th scope="col">Previously seen</th><th scope="col">Transport</th></tr></thead><tbody id="recent"><tr class="empty-row"><td colspan="9">Waiting for data</td></tr></tbody></table></div></section>
-<section id="saved-sessions" class="section"><div class="section-heading"><h2>Saved sessions</h2><span class="section-note">Local aggregates</span></div><p class="support-copy">Bounded checkpoints of server lifetimes. Recent outcome rows are not saved.</p><div id="history" class="history">History status has not loaded.</div></section>
+<section id="recent-activity" class="section"><div class="section-heading"><h2>Recent activity</h2><span class="section-note">Latest 20 outcomes</span></div><div class="filters" aria-label="Filter recent outcomes"><label>Route<select id="recent-route"><option value="">All routes</option></select></label><label>Input usage<select id="recent-usage"><option value="">All availability</option><option value="available">Available</option><option value="missing">Missing</option></select></label><label>Transport<select id="recent-transport"><option value="">All flags</option><option value="completed">Completed · completed is true</option><option value="cancelled">Cancelled · cancelled is true</option><option value="incomplete">Incomplete · response or recurrence is incomplete</option><option value="unavailable">Unavailable · a relevant flag is unavailable</option></select></label></div><p id="recent-count" class="filter-count" aria-live="polite">Waiting for data</p><div class="table-wrap"><table class="recent-table"><caption class="visually-hidden">Recent recorded outcome measurements</caption><thead><tr><th scope="col">Route</th><th scope="col">Duration</th><th scope="col">Request bytes</th><th scope="col">Response bytes</th><th scope="col">Input tokens</th><th scope="col">Output tokens</th><th scope="col">Structure</th><th scope="col">Previously seen</th><th scope="col">Transport</th></tr></thead><tbody id="recent"><tr class="empty-row"><td colspan="9">Waiting for data</td></tr></tbody></table></div></section>
+<section id="saved-sessions" class="section"><div class="section-heading"><h2>Saved sessions</h2><span class="section-note">Local aggregates</span></div><div id="history-filters" class="filters" aria-label="Filter saved sessions" hidden><label>State<select id="history-state"><option value="">All states</option><option value="running">Running</option><option value="closed">Closed</option><option value="unknown">End state unknown</option></select></label><label>Started from (UTC)<input id="history-from" type="date"></label><label>Started to (UTC)<input id="history-to" type="date"></label><label>Order<select id="history-order"><option value="newest">Newest first</option><option value="oldest">Oldest first</option></select></label></div><p class="support-copy">Exports include current totals and selected saved summaries; recent outcome rows remain in memory.</p><p id="history-count" class="filter-count" aria-live="polite"></p><div id="history" class="history">History status has not loaded.</div></section>
 <details id="scope" class="scope"><summary>Scope &amp; setup<span aria-hidden="true">Read guide</span></summary><div class="scope-body"><div><h3>Connect a compatible client</h3><ol><li>Configure Inlay's upstream URL for your existing provider.</li><li>Point the client's supported HTTP base URL at this Inlay instance's <code>/v1</code> endpoint. The client keeps responsibility for authentication.</li><li>Use the client normally, then look for admitted exchanges and recorded outcomes here.</li></ol><p>Starting Inlay does not capture other open apps. WebSocket traffic and general coding-agent compatibility are unsupported.</p></div><div><h3>Keep aggregate history</h3><p>Set <code>INLAY_HISTORY_DIR</code> to a private local directory before starting the server. Retention defaults to 20 sessions; <code>INLAY_HISTORY_MAX_SESSIONS</code> accepts 1–100.</p><p>Only aggregate summaries are written, every five seconds and on normal close. Abrupt stops can lose recent updates or leave a lock requiring manual recovery.</p><h3>Know the boundary</h3><p>This view cannot establish task success, retries, provider receipt, cost savings or whole-run capture. Missing evidence remains unavailable.</p></div></div></details>
 <footer><span>Inlay</span><span>Local measurements · No workload content retained</span></footer>
-</main></div><script src="/dashboard/app.js" defer></script></body></html>`;
+</main></div><script src="/dashboard/export.js" defer></script><script src="/dashboard/app.js" defer></script></body></html>`;
 
 export const DASHBOARD_CSS = `
 :root{color-scheme:dark;--ground:#131513;--surface:#1b1e1b;--raised:#222622;--ink:#e8ebe5;--muted:#a8b0a5;--accent:#b5cbaa;--line:#353b34;--warning:#edd3a7;--warning-bg:#302b22;--danger:#e9b3ac;font-family:"Segoe UI","Helvetica Neue",Arial,sans-serif;font-size:14px;line-height:1.55;color:var(--ink);background:var(--ground);font-synthesis:none;text-rendering:optimizeLegibility}
@@ -33,16 +33,16 @@ a:focus-visible,summary:focus-visible{outline:2px solid var(--accent);outline-of
 a,summary{-webkit-tap-highlight-color:transparent}
 p{margin:0 0 12px}
 h1,h2,h3{font-weight:500;line-height:1.25;margin:0}
-h1{font-size:36px;letter-spacing:-.035em}
+h1{font-size:26px;letter-spacing:-.025em}
 h2{font-size:20px;letter-spacing:-.02em}
 h3{font-size:15px;margin-bottom:12px}
 code{font-family:ui-monospace,Consolas,monospace;font-size:.92em;overflow-wrap:anywhere;color:var(--ink)}
 [hidden]{display:none!important}
 .visually-hidden,.skip-link:not(:focus){position:absolute;width:1px;height:1px;padding:0;overflow:hidden;clip-path:inset(50%);white-space:nowrap}
 .skip-link:focus{position:fixed;top:12px;left:12px;z-index:5;background:var(--ink);color:var(--ground);padding:12px 18px}
-.top{height:72px;display:flex;align-items:center;gap:28px;padding:0 36px;background:var(--surface)}
+.top{height:56px;display:flex;align-items:center;gap:20px;padding:0 24px;background:var(--surface)}
 .brand{display:flex;align-items:center;gap:12px;font-size:20px;font-weight:600;letter-spacing:-.025em}
-.brand svg{color:var(--accent)}
+.brand img{display:block;object-fit:contain}
 .subtitle{color:var(--muted);font-size:14px}
 .connection-wrap{margin-left:auto;display:flex;gap:12px;align-items:center}
 .connection-label{font-size:13px;color:var(--muted)}
@@ -50,26 +50,26 @@ code{font-family:ui-monospace,Consolas,monospace;font-size:.92em;overflow-wrap:a
 .connection:before{content:"";width:6px;height:6px;border-radius:50%;background:var(--accent)}
 .connection.offline{color:var(--danger)}
 .connection.offline:before{background:var(--danger)}
-.workspace{display:grid;grid-template-columns:190px minmax(0,1fr);max-width:1480px;margin:auto}
-.sidebar{padding:46px 18px 30px 28px;align-self:start;position:sticky;top:0}
+.workspace{display:grid;grid-template-columns:160px minmax(0,1fr);max-width:1480px;margin:auto}
+.sidebar{padding:26px 14px 24px 20px;align-self:start;position:sticky;top:0}
 .sidebar nav{display:flex;flex-direction:column;gap:4px}
-.sidebar nav a{padding:10px 12px;border-radius:4px;color:var(--muted)}
+.sidebar nav a{padding:7px 10px;border-radius:4px;color:var(--muted)}
 .sidebar nav a:hover,.sidebar nav a:focus-visible{color:var(--ink);background:var(--surface)}
-.sidebar-note{font-size:12px;line-height:1.7;color:var(--muted);margin:48px 12px 0}
-main{min-width:0;padding:46px 42px 28px;max-width:1240px}
+.sidebar-note{font-size:12px;line-height:1.6;color:var(--muted);margin:30px 10px 0}
+main{min-width:0;padding:20px 26px 24px;max-width:1240px}
 section,details[id]{scroll-margin-top:24px}
 .page-heading{display:flex;justify-content:space-between;align-items:baseline;gap:20px}
 .updated{color:var(--muted);font-size:12px;margin:0;white-space:nowrap}
-.intro{color:var(--muted);margin:10px 0 28px;font-size:15px}
-.activity-summary{background:var(--surface);padding:22px 24px;display:flex;justify-content:space-between;gap:24px;align-items:flex-start;border-radius:6px}
-.activity-summary h2{font-size:21px;margin-bottom:6px}
-.activity-summary p{color:var(--muted);max-width:65ch;margin:0}
+.intro{color:var(--muted);margin:6px 0 18px;font-size:14px}
+.activity-state{display:flex;flex-wrap:wrap;align-items:baseline;gap:8px 16px;margin:0 0 12px}
+.activity-state strong{font-size:16px;font-weight:500}
+.activity-state>span:nth-child(2){color:var(--muted);font-size:13px}
 .session-state{font-size:12px;color:var(--accent);padding-top:4px;white-space:nowrap}
 .notice{background:var(--warning-bg);color:var(--warning);padding:16px 20px;border-radius:4px;margin-bottom:20px}
-.lifecycle{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));column-gap:24px;row-gap:22px;padding:26px 0 0}
+.lifecycle{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));column-gap:20px;row-gap:14px;padding:8px 0 0}
 .metric{min-width:0}
 .metric .label{font-size:13px;color:var(--muted)}
-.metric .value{font-size:32px;letter-spacing:-.025em;line-height:1.35;font-variant-numeric:tabular-nums;overflow-wrap:anywhere}
+.metric .value{font-size:26px;letter-spacing:-.025em;line-height:1.3;font-variant-numeric:tabular-nums;overflow-wrap:anywhere}
 .metric .detail{font-size:12px;color:var(--muted);margin-top:5px}
 .runtime-meta{grid-column:1/-1;display:flex;flex-wrap:wrap;gap:14px 36px;color:var(--muted);font-size:12px;background:var(--surface);border-radius:4px;padding:12px 16px}
 .runtime-meta .metric{display:flex;gap:8px;align-items:baseline;flex-wrap:wrap}
@@ -78,11 +78,16 @@ section,details[id]{scroll-margin-top:24px}
 .definition{margin-top:16px;color:var(--muted);max-width:80ch;font-size:13px}
 .definition summary{cursor:pointer;padding:5px 0;width:fit-content}
 .definition p{margin:12px 0}
-.section{margin-top:42px}
+.section{margin-top:22px}
 .section-heading{display:flex;align-items:baseline;justify-content:space-between;gap:16px;margin-bottom:10px}
 .section-note{color:var(--muted);font-size:12px;text-align:right}
 .support-copy{color:var(--muted);font-size:14px;max-width:80ch}
-.usage{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:24px;padding:20px 0 12px}
+.filters{display:flex;flex-wrap:wrap;align-items:end;gap:10px 14px;margin:12px 0 6px}
+.filters label{display:grid;gap:4px;color:var(--muted);font-size:12px}
+.filters select,.filters input{min-height:36px;min-width:150px;padding:6px 9px;border:1px solid var(--line);border-radius:4px;background:var(--surface);color:var(--ink);font:inherit;font-size:13px}
+.filters select:focus-visible,.filters input:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.filter-count{font-size:12px;color:var(--muted);margin:8px 0 0}
+.usage{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:18px;padding:14px 0 8px}
 .usage .value{font-size:28px}
 .metric .value.unavailable{font-size:18px;line-height:2.1;letter-spacing:0;color:var(--muted)}
 .volume{display:flex;flex-wrap:wrap;gap:16px 34px;margin-top:12px;background:var(--surface);padding:14px 18px;border-radius:4px}
@@ -168,11 +173,9 @@ main{padding-left:26px;padding-right:26px}
 .sidebar nav a{padding:8px 10px;font-size:12px}
 .sidebar-note{display:none}
 main{padding:26px 20px}
-.page-heading h1{font-size:30px}
+.page-heading h1{font-size:24px}
 .intro{margin-bottom:22px}
-.activity-summary{padding:20px;gap:14px}
-.activity-summary h2{font-size:19px}
-.activity-summary p{font-size:13px}
+.activity-state{gap:6px 12px}
 .lifecycle,.usage{grid-template-columns:repeat(2,minmax(0,1fr));gap:22px 24px}
 .runtime-meta{gap:10px}
 .runtime-meta .metric{display:block}
@@ -180,7 +183,7 @@ main{padding:26px 20px}
 .runtime-meta .value{display:inline}
 .runtime-meta .detail{display:block}
 .volume{gap:14px 24px}
-.section{margin-top:34px}
+.section{margin-top:24px}
 .section-heading h2{font-size:19px}
 .observation-details{padding:0 20px}
 .detail-metrics,.scope-body{grid-template-columns:1fr;gap:18px}
@@ -199,6 +202,16 @@ main{padding:26px 20px}
 footer{display:block}
 footer span{display:block;margin-bottom:6px}
 }
+
+.export-actions{display:flex;gap:6px;flex-wrap:wrap}
+button{font:inherit;font-size:12px;background:var(--raised);color:var(--ink);border:1px solid var(--line);border-radius:4px;padding:6px 10px;cursor:pointer}
+button:hover{background:var(--surface);border-color:var(--muted)}
+button:disabled{opacity:.5;cursor:default}
+button:focus-visible{outline:2px solid var(--accent);outline-offset:3px}
+.export-status{font-size:12px;color:var(--muted);margin:0}
+.export-status:empty{display:none}
+.page-heading{align-items:center}
+@media(max-width:760px){.page-heading{display:flex;flex-wrap:wrap;gap:12px}.export-actions{margin-bottom:4px}}
 @media(prefers-reduced-motion:no-preference){a,summary{transition:color 140ms ease,background-color 140ms ease}
 }
 @media(prefers-reduced-motion:reduce){*,*:before,*:after{animation:none!important;transition:none!important;scroll-behavior:auto!important}
@@ -259,9 +272,8 @@ export const DASHBOARD_JS = `(() => {
     const admitted = session.lifecycle.admitted;
     $('activity-title').textContent = count === 0 ? 'No recorded outcomes' : format(count) + ' recorded outcomes';
     $('activity-description').textContent = count === 0
-      ? admitted > 0 ? 'Handler activity exists, but no outcome summaries have been recorded. Admission and outcome coverage describe different populations.'
-        : 'No outcomes have been recorded in this instance. Only traffic routed through Inlay can appear here.'
-      : 'These summaries cover this server lifetime. They do not identify a coding agent, conversation or task.';
+      ? admitted > 0 ? 'Handler activity exists; no outcome summaries recorded.' : 'Only traffic routed through Inlay appears here.'
+      : 'This server lifetime · no agent, conversation or task attribution.';
     $('usage-note').textContent = count === 0 ? 'No reported usage yet. There are no recorded outcomes to sum.'
       : modes.observation === 'off' ? 'Observation is off. Provider usage observation is disabled; missing fields remain unavailable.'
       : 'Each field has its own coverage. Missing provider values remain unavailable, not zero.';
@@ -342,29 +354,57 @@ export const DASHBOARD_JS = `(() => {
     return value === true ? yes : value === false ? no : unknown;
   }
 
-  let recentProjection = null;
-  function renderRecent(records) {
-    // Keep open row disclosures while the presented records are unchanged.
-    const projection = JSON.stringify(records);
-    if (projection === recentProjection) return;
-    recentProjection = projection;
+  const recentControls = ['recent-route', 'recent-usage', 'recent-transport'];
+  let recentRecords = [];
+  let visibleRecent = [];
+  let visibleHistory = [];
+  let viewCurrent = null;
+  let viewModes = {};
+  let viewHistory = { status: 'unavailable', reason: null, retentionSessions: 0 };
+  let rendering = false;
+  function emitView() {
+    if (!viewCurrent || typeof CustomEvent !== 'function') return;
+    document.dispatchEvent(new CustomEvent('inlay:view', { detail: {
+      current: viewCurrent, modes: viewModes,
+      history: { status: viewHistory?.status, reason: viewHistory?.reason ?? null, retentionSessions: viewHistory?.retentionSessions ?? 0, sessions: visibleHistory },
+      selection: Object.fromEntries(['history-state', 'history-from', 'history-to', 'history-order'].map(id => [id, $(id).value]))
+    } }));
+  }
+  let recentViewProjection = null;
+  let routeProjection = null;
+  function recentMatches(record) {
+    const route = $('recent-route').value;
+    const usage = $('recent-usage').value;
+    const transport = $('recent-transport').value;
+    if (route && record.route !== route) return false;
+    if (usage === 'available' && record.inputTokens == null) return false;
+    if (usage === 'missing' && record.inputTokens != null) return false;
+    if (transport === 'completed' && record.completed !== true) return false;
+    if (transport === 'cancelled' && record.cancelled !== true) return false;
+    if (transport === 'incomplete' && record.responseObservationIncomplete !== true && record.recurrenceIncomplete !== true) return false;
+    if (transport === 'unavailable' && record.completed != null && record.cancelled != null && record.responseObservationIncomplete != null && record.recurrenceIncomplete != null) return false;
+    return true;
+  }
+  function updateRecent() {
+    const records = recentRecords.filter(recentMatches);
+    visibleRecent = records;
+    const projection = JSON.stringify([records, recentRecords.length, recentControls.map(id => $(id).value)]);
+    if (projection === recentViewProjection) return;
+    recentViewProjection = projection;
     const parent = clear('recent');
-    if (!Array.isArray(records) || records.length === 0) {
-      const row = document.createElement('tr');
-      row.className = 'empty-row';
-      const empty = document.createElement('td');
-      empty.colSpan = 9;
-      addText(empty, 'No recorded outcomes', 'empty-title');
-      addText(empty, 'Only requests explicitly routed through Inlay produce observations.');
-      const link = document.createElement('a');
-      link.textContent = 'Read scope & setup';
-      link.href = '#scope';
-      empty.append(link);
-      row.append(empty);
-      parent.append(row);
+    const active = recentControls.some(id => $(id).value !== '');
+    $('recent-count').textContent = recentRecords.length === 0 ? '0 of 0 retained outcomes · No recorded outcomes'
+      : format(records.length) + ' of ' + format(recentRecords.length) + ' retained outcomes' + (active && records.length === 0 ? ' · No matches' : '');
+    if (records.length === 0) {
+      const row = document.createElement('tr'); row.className = 'empty-row';
+      const empty = document.createElement('td'); empty.colSpan = 9;
+      addText(empty, recentRecords.length === 0 ? 'No recorded outcomes' : 'No outcomes match these filters', 'empty-title');
+      if (recentRecords.length === 0) addText(empty, 'Only requests explicitly routed through Inlay produce observations.');
+      row.append(empty); parent.append(row);
+      if (!rendering) emitView();
       return;
     }
-    records.slice(0, 20).forEach((record) => {
+    records.forEach((record) => {
       const row = document.createElement('tr');
       cell(row, record.route, 'route', 'Route');
       cell(row, record.durationMs === null ? 'Unavailable' : format(record.durationMs) + ' ms', '', 'Duration');
@@ -374,37 +414,49 @@ export const DASHBOARD_JS = `(() => {
       cell(row, format(record.outputTokens), '', 'Output tokens');
       cell(row, record.canonicalBytes === null ? (record.requestStructureUnavailableReason || 'Unavailable') : format(record.canonicalBytes) + ' bytes · ' + format(record.inputItems) + ' items', '', 'Structure');
       cell(row, format(record.previouslySeenItems), '', 'Previously seen');
-      const transport = document.createElement('td');
-      addText(transport, 'Transport', 'cell-label');
-      const details = document.createElement('details');
-      const summary = document.createElement('summary');
-      summary.textContent = 'Response flags';
-      details.append(summary);
-      for (const value of [
-        boolLabel(record.completed, 'completed', 'not completed', 'completion unavailable'),
-        boolLabel(record.cancelled, 'cancelled', 'not cancelled', 'cancellation unavailable'),
-        boolLabel(record.terminalEventObserved, 'terminal event', 'no terminal event', 'terminal status unavailable'),
-        boolLabel(record.responseObservationIncomplete, 'Known response incompleteness: yes', 'Known response incompleteness: no', 'Response incompleteness unavailable'),
-        boolLabel(record.recurrenceIncomplete, 'Known recurrence incompleteness: yes', 'Known recurrence incompleteness: no', 'Recurrence incompleteness unavailable'),
-      ]) {
-        const text = document.createElement('p');
-        text.textContent = value;
-        details.append(text);
-      }
-      transport.append(details);
-      row.append(transport);
-      parent.append(row);
+      const transport = document.createElement('td'); addText(transport, 'Transport', 'cell-label');
+      const details = document.createElement('details'); const summary = document.createElement('summary');
+      summary.textContent = 'Response flags'; details.append(summary);
+      for (const value of [boolLabel(record.completed, 'completed', 'not completed', 'completion unavailable'), boolLabel(record.cancelled, 'cancelled', 'not cancelled', 'cancellation unavailable'), boolLabel(record.terminalEventObserved, 'terminal event', 'no terminal event', 'terminal status unavailable'), boolLabel(record.responseObservationIncomplete, 'Known response incompleteness: yes', 'Known response incompleteness: no', 'Response incompleteness unavailable'), boolLabel(record.recurrenceIncomplete, 'Known recurrence incompleteness: yes', 'Known recurrence incompleteness: no', 'Recurrence incompleteness unavailable')]) { const text = document.createElement('p'); text.textContent = value; details.append(text); }
+      transport.append(details); row.append(transport); parent.append(row);
     });
+    if (!rendering) emitView();
+  }
+  recentControls.forEach(id => $(id).addEventListener('change', updateRecent));
+  function renderRecent(records) {
+    recentRecords = Array.isArray(records) ? records.slice(0, 20) : [];
+    const route = $('recent-route');
+    const selected = route.value;
+    const routes = ['/v1/responses', '/v1/codex/responses', '/v1/chat/completions'];
+    const key = JSON.stringify(routes);
+    if (routeProjection !== key) {
+      routeProjection = key;
+      while (route.firstChild) route.removeChild(route.firstChild);
+      const all = document.createElement('option'); all.value = ''; all.textContent = 'All routes'; route.append(all);
+      routes.forEach(value => { const option = document.createElement('option'); option.value = value; option.textContent = value; route.append(option); });
+    }
+    route.value = routes.includes(selected) ? selected : '';
+    updateRecent();
   }
 
   const historyDisclosures = new Map();
   let historyInfo = null;
+  let historyEmpty = null;
+  const historyControls = ['history-state', 'history-from', 'history-to', 'history-order'];
+  historyControls.forEach(id => $(id).addEventListener('change', () => { if (lastHistory) renderHistory(lastHistory); }));
+  let lastHistory = null;
   function renderHistory(history) {
     const parent = $('history');
+    $('history-filters').hidden = history?.status !== 'ready';
     if (history?.status !== 'ready') {
       clear('history');
       historyDisclosures.clear();
       historyInfo = null;
+      historyEmpty = null;
+      lastHistory = null;
+      viewHistory = history || { status: 'unavailable', reason: null, retentionSessions: 0 };
+      visibleHistory = [];
+      $('history-count').textContent = '';
       const empty = document.createElement('div');
       empty.className = 'history-empty';
       const off = history?.status === 'off';
@@ -415,15 +467,38 @@ export const DASHBOARD_JS = `(() => {
       empty.append(note);
       if (history.reason) addText(empty, 'Status: ' + history.reason, 'detail');
       parent.append(empty);
+      if (!rendering) emitView();
       return;
     }
-    const sessions = Array.isArray(history.sessions) ? history.sessions : [];
+    lastHistory = history;
+    const sessions = Array.isArray(history.sessions) ? history.sessions.slice(0, 100) : [];
+    const stateFilter = $('history-state').value;
+    const from = $('history-from').value;
+    const to = $('history-to').value;
+    const order = $('history-order').value;
+    const invalidRange = from && to && from > to;
+    const filtered = sessions.filter(session => {
+      if (invalidRange) return false;
+      const state = ['running', 'closed'].includes(session.state) ? session.state : 'unknown';
+      const started = typeof session.startedAt === 'string' ? session.startedAt.slice(0, 10) : '';
+      return (!stateFilter || state === stateFilter) && (!from || started >= from) && (!to || started <= to);
+    });
+    filtered.sort((a, b) => {
+      const aTime = Date.parse(a.startedAt) || 0, bTime = Date.parse(b.startedAt) || 0;
+      return order === 'oldest' ? aTime - bTime : bTime - aTime;
+    });
+    $('history-count').textContent = sessions.length === 0 ? '0 of 0 retained summaries · No stored sessions'
+      : format(filtered.length) + ' of ' + format(sessions.length) + ' retained summaries' + (invalidRange ? ' · Start-date range is reversed' : filtered.length === 0 ? ' · No matches' : '');
     if (!historyInfo) {
       clear('history');
       historyInfo = addText(parent, '', 'detail');
     }
-    historyInfo.textContent = 'Showing ' + Math.min(20, sessions.length) + ' of ' + format(sessions.length) + ' retained summaries · retention limit ' + format(history.retentionSessions) + ' sessions' + (sessions.length === 0 ? ' · No stored sessions' : '');
-    const visible = sessions.slice(0, 20);
+    historyInfo.textContent = 'Retained aggregate summaries · retention limit ' + format(history.retentionSessions) + ' sessions';
+    const visible = filtered;
+    visibleHistory = visible;
+    viewHistory = history;
+    if (!historyEmpty) { historyEmpty = document.createElement('p'); historyEmpty.className = 'filter-count'; parent.append(historyEmpty); }
+    historyEmpty.textContent = visible.length === 0 && sessions.length > 0 ? 'No saved sessions match these filters.' : '';
     const keys = new Set(visible.map(session => session.sessionId));
     for (const [key, nodes] of historyDisclosures) {
       if (!keys.has(key)) { parent.removeChild(nodes.details); historyDisclosures.delete(key); }
@@ -468,9 +543,13 @@ export const DASHBOARD_JS = `(() => {
       addMetric(metrics, 'Finalized', format(session.lifecycle?.finalized));
 
     });
+    if (!rendering) emitView();
   }
 
   function render(data) {
+    rendering = true;
+    viewCurrent = data.current;
+    viewModes = data.modes || {};
     const session = data.current;
     const totals = session.totals;
     renderContext(session, totals, data.modes || {});
@@ -482,6 +561,8 @@ export const DASHBOARD_JS = `(() => {
     renderRecurrence(session, totals, data.modes || {});
     renderRecent(data.recent);
     renderHistory(data.history);
+    rendering = false;
+    emitView();
   }
 
   let lastSuccess = false;

@@ -9,8 +9,8 @@ Start the source checkout containing M2, then open `http://127.0.0.1:8787/` or
 `http://127.0.0.1:8787/dashboard`. The same loopback service serves the page and
 its assets; no separate frontend build, account or internet connection is needed.
 Existing harness routing and authentication stay unchanged. The dashboard uses a
-dark theme with section navigation and a responsive activity layout. Runtime
-counts lead the overview; usage totals show field coverage alongside values.
+dark theme with section navigation and a responsive activity layout. The compact overview prioritizes runtime
+counts; usage totals show field coverage alongside values.
 Integrity, recurrence, response flags and saved session details expand on demand.
 Scope and setup guidance explains routing, retention and measurement limits.
 Saved session disclosures retain their open state and focus across checkpoints.
@@ -129,10 +129,53 @@ and `missing`; transport flags have `yes`, `no` and `unavailable`. A null sum wi
 available observations can also indicate an unrepresentable aggregate, not zero.
 History reports `off`, `ready` or `unavailable` with a fixed reason. Stored running
 summaries are last checkpoints and can lag the live view; historical rows are
-shown newest first, up to 20, with the retained count and configured limit.
+shown newest first by default, across the bounded retained window (at most 100),
+with the matching count and configured retention limit.
 
 No task success, provider receipt, logical retry, whole-run capture, cross-session
 item identity, cost savings or measured developer benefit follows from this UI.
 The purpose is to inspect existing evidence during daily use. Technical tests
 validate mapping, refresh, privacy, retention and compatibility; real-world value
 remains to be learned through use.
+
+
+## Filters and aggregate exports
+
+Recent filters select route, reported input-usage availability and existing
+transport flags within the latest 20 outcome rows. Flags can overlap; completed
+means the existing completed flag is true, not task success. Missing input usage
+is distinct from a reported zero. Filtering does not recalculate session totals.
+Saved-session filters select state and inclusive start dates in UTC, with newest
+or oldest ordering, across all retained summaries. No-match and no-data states
+are distinct. Reversed date ranges are identified explicitly.
+
+Export JSON or CSV downloads unfiltered current aggregates and the selected
+saved-session aggregates through a fixed allowlist. The saved checkpoint for the
+current session is omitted to avoid duplicating it. Both formats include usage
+coverage, lifecycle, transport, structural and recurrence aggregates, history
+availability, selection metadata and export time. CSV uses blank cells for null
+or unavailable values; coverage columns preserve their meaning. Offline exports
+are marked stale. A saved running session is only its last checkpoint.
+
+Recent rows, request/session identifiers, prompts, source, tool output, raw
+requests/responses, headers, credentials, configuration URLs and local paths are
+excluded. The exported file is a deliberate user-selected local copy of approved
+aggregates; it is not a transcript, task total, billing record or cloud upload.
+The export scripts and existing project logo are served by the guarded dashboard
+routes, without dependencies or a new provider observation boundary.
+
+## Continuous local operation
+
+Inlay observes compatible HTTP traffic explicitly routed through its configured
+upstream. Keeping it running, including through a local Windows sign-in task,
+does not observe this chat, discover other applications, establish per-agent
+identity or cover WebSocket/model-discovery routes. Enable aggregate history
+before starting it, then verify admitted and recorded outcome counts during a
+normal client session before claiming real-data collection. A healthy dashboard
+alone does not verify client routing or provider receipt.
+
+A local startup task is operator configuration, not a released universal-agent
+integration. Use a pinned, verified source checkout, a dedicated history directory
+and the existing credential-owning client. Automatic startup cannot guarantee
+availability while the machine is off or asleep. Preserve the stale-lock recovery
+rule above rather than silently deleting a lock on restart.

@@ -62,11 +62,18 @@ test("dashboard aliases and assets work locally without changing health or metri
     assert.match(response.headers.get("content-security-policy")!, /connect-src 'self'/);
     assert.equal(response.headers.get("cache-control"), "no-store");
   }
-  for (const path of ["/dashboard/app.js", "/dashboard/style.css"]) {
+  for (const path of ["/dashboard/app.js", "/dashboard/style.css", "/dashboard/export.js"]) {
     const response = await fetch(base + path);
     assert.equal(response.status, 200);
     assert.ok((await response.text()).length > 100);
   }
+  const logo = await fetch(base + "/dashboard/logo.png");
+  assert.equal(logo.status, 200);
+  assert.equal(logo.headers.get("content-type"), "image/png");
+  assert.deepEqual(Buffer.from(await logo.arrayBuffer()), await readFile(new URL("../assets/inlay-mark.png", import.meta.url)));
+  assert.match(logo.headers.get("content-security-policy")!, /img-src 'self'/);
+  const deniedLogo = await fetch(base + "/dashboard/logo.png", { headers: { Origin: "https://example.com" } });
+  assert.equal(deniedLogo.status, 403);
   assert.deepEqual((await json(base, "/health")).data, { status: "ok", upstreamConfigured: false, mode: "transparent" });
   assert.deepEqual((await json(base, "/metrics")).data, before.data);
   assert.equal((await fetch(base + "/dashboard", { method: "POST" })).status, 404);
