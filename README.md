@@ -36,6 +36,7 @@ generalized reliability and measured developer benefit have not been established
 | `GET /metrics` | Process-local measurement snapshot |
 | `GET /`, `GET /dashboard` | Local observation page (unreleased M2) |
 | `GET /dashboard/data` | Approved presentation snapshot (unreleased M2) |
+| `GET /trajectories` | Local redirect to optional trajectory observer (development) |
 | `GET /v1/models` | Unobserved model-catalog pass-through (unreleased M2) |
 | `POST /v1/responses` | Codex HTTP Responses profile |
 | `POST /v1/codex/responses` | Narrow Pi Codex Responses alias |
@@ -151,3 +152,7 @@ CI verifies the checkout and an extracted source archive on Node 22.15.0.
 [Release requirements](docs/releases.md) describe version approval, source
 verification and upgrade considerations. Passing technical checks does not
 authorize publication or establish a product milestone.
+
+## Structured agent trajectories (development)
+
+The opt-in local Codex record reader adds turn links, tool requests/results, command exit codes, file-change reports, timings and explicit gaps. Its separate loopback viewer runs alongside the exchange dashboard. See [setup, retention and measurement boundaries](docs/agent-trajectories.md). These runtime reports do not establish independently verified task success or semantic tool quality.

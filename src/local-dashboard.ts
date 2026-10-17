@@ -15,7 +15,7 @@ const DASHBOARD_LOGO = readFileSync(new URL("../assets/inlay-mark.png", import.m
 
 const REFRESH_MS = 2_000;
 const CHECKPOINT_MS = 5_000;
-const paths = new Set(["/", "/dashboard", "/dashboard/", "/dashboard/data", "/dashboard/style.css", "/dashboard/app.js", "/dashboard/logo.png", "/dashboard/export.js"]);
+const paths = new Set(["/trajectories", "/", "/dashboard", "/dashboard/", "/dashboard/data", "/dashboard/style.css", "/dashboard/app.js", "/dashboard/logo.png", "/dashboard/export.js"]);
 
 export function isDashboardRequest(request: IncomingMessage): boolean {
   return request.method === "GET" && paths.has(request.url ?? "");
@@ -98,6 +98,11 @@ export class LocalDashboard {
     response.setHeader("Content-Security-Policy", "default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self'; connect-src 'self'; base-uri 'none'; frame-ancestors 'none'; form-action 'none'");
     if (!localBrowserRequest(request)) {
       sendJson(response, 403, { error: { code: "inlay_dashboard_local_only" } });
+      return true;
+    }
+    if (request.url === "/trajectories") {
+      response.writeHead(302, { Location: "http://127.0.0.1:8788/" });
+      response.end();
       return true;
     }
     if (request.url === "/dashboard/data") {
