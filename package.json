@@ -12,7 +12,8 @@
     "start": "node --experimental-strip-types src/server.ts",
     "pi:c2:topology": "node --experimental-strip-types scripts/pi-c2-runner.ts",
     "test": "node --experimental-strip-types --test test/*.test.ts",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "observe:codex": "node --experimental-strip-types src/observe-codex.ts"
   },
   "devDependencies": {
     "@earendil-works/pi-coding-agent": "0.86.0",
